@@ -1,0 +1,18 @@
+[X] F501, F502, F701 - Non Standard Fuse 
+[X] J401 - SDCARD
+[X] J501 - IEC320
+[X] J502 - IEC-NEMA
+[X] J601 - Thermocouple Connector
+[X] J701 - STD 0.1" 3 pin
+[X] J702 - CAN Connector - Want Microfit
+[X] J703 - UART Connector - Want FTDI
+[X] J704 - USB Connector
+[X] K501 - Non Standard Relay Pinout
+[X] L701 - Common Mode Choke
+[X] P501 - AC Power Converter Non Standard Part
+[X] R504 - Current Sense Resistor
+[X] SEG301, SEG302, SEG303, SEG304 - 7 Segment Display Non Standard Part
+[X] SW201 - Non Standard Push
+[X] SW401, SW402, SW403 - Non Standard Push
+[X] SW404 - Non Standard Rotary encoder
+[X] U601 - Non Standard VQFN-20
