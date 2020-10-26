@@ -8,13 +8,13 @@ All onboard devices interface to the microcontroller using I2C (with the excepti
 Here is a rendering of the board with all of the parts modelled.
 Some models from online resources or default in KiCAD, but many were made by me in Solidworks.
 
-![Image of Board](https://github.com/Baldstrom/ReflowOven/tree/main/Pics/board_render.png)
+![Image of Board](https://raw.githubusercontent.com/Baldstrom/ReflowOven/main/Pics/board_render.png)
 
 The user interface portion of the board is able to be cut off so that it can be placed anywhere in a mechanical chassis for ease of construction.
 
 Here is the board as seen by default in the KiCAD PCBnew Software.
 
-![Image of PCBnew Render](https://github.com/Baldstrom/ReflowOven/tree/main/Pics/Board.png)
+![Image of PCBnew Render](https://raw.githubusercontent.com/Baldstrom/ReflowOven/main/Pics/Board.png)
 
 A PDF of the Schematic Sheets can be found [here](https://github.com/Baldstrom/ReflowOven/blob/main/PDFs/ReflowOven.pdf).
 
