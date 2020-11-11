@@ -1,0 +1,1131 @@
+ARM GAS  /tmp/ccL8eWVw.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"PCF8551ATT_Driver.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.WriteRegister_PCF8551,"ax",%progbits
+  18              		.align	1
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	WriteRegister_PCF8551:
+  26              	.LVL0:
+  27              	.LFB137:
+  28              		.file 1 "Core/Src/PCF8551ATT_Driver.c"
+   1:Core/Src/PCF8551ATT_Driver.c **** #include "PCF8551ATT_Driver.h"
+   2:Core/Src/PCF8551ATT_Driver.c **** 
+   3:Core/Src/PCF8551ATT_Driver.c **** static uint8_t DEVICE_ADDR;
+   4:Core/Src/PCF8551ATT_Driver.c **** static uint8_t WriteRegister_PCF8551(uint8_t addr, uint8_t reg, uint8_t value, SMBUS_HandleTypeDef 
+   5:Core/Src/PCF8551ATT_Driver.c **** static uint8_t ReadRegister_PCF8551(uint8_t addr, uint8_t reg, uint8_t *output, SMBUS_HandleTypeDef
+   6:Core/Src/PCF8551ATT_Driver.c **** static uint8_t WriteMultipleRegister_PCF8551(uint8_t addr, uint8_t reg, uint8_t *value, uint8_t num
+   7:Core/Src/PCF8551ATT_Driver.c **** 
+   8:Core/Src/PCF8551ATT_Driver.c **** uint8_t Init_PCF8551(PCF8551_Config *configuration, SMBUS_HandleTypeDef *I2C)
+   9:Core/Src/PCF8551ATT_Driver.c **** {
+  10:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = PCF8551_SUCCESS;
+  11:Core/Src/PCF8551ATT_Driver.c ****     DEVICE_ADDR = configuration->DEV_ADDR;
+  12:Core/Src/PCF8551ATT_Driver.c ****     uint8_t devCtlReg = !!configuration->CLOCK_OUT_ENABLED;
+  13:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->INT_OSC_ENABLED << 1;
+  14:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->FRAME_FREQ << 2;
+  15:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DEVICE_CTL_REG, devCtlReg, I2C);
+  16:Core/Src/PCF8551ATT_Driver.c ****     uint8_t displayCtlReg = configuration->DISPLAY_ENABLE;
+  17:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BIAS_MODE << 1;
+  18:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->DRIVE_MODE << 2;
+  19:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BOOST << 4;
+  20:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_1, displayCtlReg, I2C);
+  21:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg = configuration->INVERSION_MODE;
+  22:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BLINK << 1;
+  23:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_2, displayCtlReg, I2C);
+  24:Core/Src/PCF8551ATT_Driver.c ****     return status;
+  25:Core/Src/PCF8551ATT_Driver.c **** }
+  26:Core/Src/PCF8551ATT_Driver.c **** 
+  27:Core/Src/PCF8551ATT_Driver.c **** uint8_t WriteSegment_PCF8551(PCF8551_COM_PORT port, PCF8551_SEG segment, uint8_t value, SMBUS_Handl
+  28:Core/Src/PCF8551ATT_Driver.c **** {
+  29:Core/Src/PCF8551ATT_Driver.c ****     uint8_t reg = (port + 1) * (uint8_t) PCF8551_COM0_SEG0 + (uint8_t) segment;
+  30:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = WriteRegister_PCF8551(DEVICE_ADDR, reg, value, I2C);
+ARM GAS  /tmp/ccL8eWVw.s 			page 2
+
+
+  31:Core/Src/PCF8551ATT_Driver.c ****     return status;
+  32:Core/Src/PCF8551ATT_Driver.c **** }
+  33:Core/Src/PCF8551ATT_Driver.c **** 
+  34:Core/Src/PCF8551ATT_Driver.c **** uint8_t WritePort_PCF8551(PCF8551_COM_PORT port, uint32_t value, SMBUS_HandleTypeDef *I2C)
+  35:Core/Src/PCF8551ATT_Driver.c **** {
+  36:Core/Src/PCF8551ATT_Driver.c ****     uint8_t buffer[4];
+  37:Core/Src/PCF8551ATT_Driver.c ****     buffer[0] = value;
+  38:Core/Src/PCF8551ATT_Driver.c ****     buffer[1] = value >> 8;
+  39:Core/Src/PCF8551ATT_Driver.c ****     buffer[2] = value >> 16;
+  40:Core/Src/PCF8551ATT_Driver.c ****     buffer[3] = value >> 24;
+  41:Core/Src/PCF8551ATT_Driver.c **** 
+  42:Core/Src/PCF8551ATT_Driver.c ****     uint8_t reg = (port + 1) * (uint8_t) PCF8551_COM0_SEG0;
+  43:Core/Src/PCF8551ATT_Driver.c **** 
+  44:Core/Src/PCF8551ATT_Driver.c ****     return WriteMultipleRegister_PCF8551(DEVICE_ADDR, reg, buffer, 4, I2C);
+  45:Core/Src/PCF8551ATT_Driver.c **** }
+  46:Core/Src/PCF8551ATT_Driver.c **** 
+  47:Core/Src/PCF8551ATT_Driver.c **** uint8_t GetSegmentValueFromDigit(uint8_t digit, uint8_t invertOutput)
+  48:Core/Src/PCF8551ATT_Driver.c **** {
+  49:Core/Src/PCF8551ATT_Driver.c ****     uint8_t segVal = 0x00;
+  50:Core/Src/PCF8551ATT_Driver.c ****     switch(digit) {
+  51:Core/Src/PCF8551ATT_Driver.c ****         case 1:
+  52:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  53:Core/Src/PCF8551ATT_Driver.c ****             break;
+  54:Core/Src/PCF8551ATT_Driver.c ****         case 2:
+  55:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  56:Core/Src/PCF8551ATT_Driver.c ****             break;
+  57:Core/Src/PCF8551ATT_Driver.c ****         case 3:
+  58:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  59:Core/Src/PCF8551ATT_Driver.c ****             break;
+  60:Core/Src/PCF8551ATT_Driver.c ****         case 4:
+  61:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  62:Core/Src/PCF8551ATT_Driver.c ****             break;
+  63:Core/Src/PCF8551ATT_Driver.c ****         case 5:
+  64:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  65:Core/Src/PCF8551ATT_Driver.c ****             break;
+  66:Core/Src/PCF8551ATT_Driver.c ****         case 6:
+  67:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  68:Core/Src/PCF8551ATT_Driver.c ****             break;
+  69:Core/Src/PCF8551ATT_Driver.c ****         case 7:
+  70:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  71:Core/Src/PCF8551ATT_Driver.c ****             break;
+  72:Core/Src/PCF8551ATT_Driver.c ****         case 8:
+  73:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  74:Core/Src/PCF8551ATT_Driver.c ****             break;
+  75:Core/Src/PCF8551ATT_Driver.c ****         case 9:
+  76:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  77:Core/Src/PCF8551ATT_Driver.c ****             break;
+  78:Core/Src/PCF8551ATT_Driver.c ****     }
+  79:Core/Src/PCF8551ATT_Driver.c ****     if (invertOutput) {
+  80:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+  81:Core/Src/PCF8551ATT_Driver.c ****     }
+  82:Core/Src/PCF8551ATT_Driver.c ****     return segVal;
+  83:Core/Src/PCF8551ATT_Driver.c **** }
+  84:Core/Src/PCF8551ATT_Driver.c **** 
+  85:Core/Src/PCF8551ATT_Driver.c **** uint8_t GetSegmentValueFromCharacter(char character, uint8_t invertOutput) 
+  86:Core/Src/PCF8551ATT_Driver.c **** {
+  87:Core/Src/PCF8551ATT_Driver.c ****     uint8_t segVal = 0x00;
+ARM GAS  /tmp/ccL8eWVw.s 			page 3
+
+
+  88:Core/Src/PCF8551ATT_Driver.c ****     switch(character) {
+  89:Core/Src/PCF8551ATT_Driver.c ****         case 'a':
+  90:Core/Src/PCF8551ATT_Driver.c ****         case 'A':
+  91:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  92:Core/Src/PCF8551ATT_Driver.c ****             break;
+  93:Core/Src/PCF8551ATT_Driver.c ****         case 'b':
+  94:Core/Src/PCF8551ATT_Driver.c ****         case 'B':
+  95:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+  96:Core/Src/PCF8551ATT_Driver.c ****             break;
+  97:Core/Src/PCF8551ATT_Driver.c ****         case 'c':
+  98:Core/Src/PCF8551ATT_Driver.c ****         case 'C':
+  99:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 100:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 101:Core/Src/PCF8551ATT_Driver.c ****         case 'd':
+ 102:Core/Src/PCF8551ATT_Driver.c ****         case 'D':
+ 103:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 104:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 105:Core/Src/PCF8551ATT_Driver.c ****         case 'e':
+ 106:Core/Src/PCF8551ATT_Driver.c ****         case 'E':
+ 107:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 108:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 109:Core/Src/PCF8551ATT_Driver.c ****         case 'f':
+ 110:Core/Src/PCF8551ATT_Driver.c ****         case 'F':
+ 111:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 112:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 113:Core/Src/PCF8551ATT_Driver.c ****         case 'g':
+ 114:Core/Src/PCF8551ATT_Driver.c ****         case 'G':
+ 115:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 116:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 117:Core/Src/PCF8551ATT_Driver.c ****         case 'h':
+ 118:Core/Src/PCF8551ATT_Driver.c ****         case 'H':
+ 119:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 120:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 121:Core/Src/PCF8551ATT_Driver.c ****         case 'i':
+ 122:Core/Src/PCF8551ATT_Driver.c ****         case 'I':
+ 123:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 124:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 125:Core/Src/PCF8551ATT_Driver.c ****         case 'j':
+ 126:Core/Src/PCF8551ATT_Driver.c ****         case 'J':
+ 127:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 128:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 129:Core/Src/PCF8551ATT_Driver.c ****         case 'k':
+ 130:Core/Src/PCF8551ATT_Driver.c ****         case 'K':
+ 131:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 132:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 133:Core/Src/PCF8551ATT_Driver.c ****         case 'l':
+ 134:Core/Src/PCF8551ATT_Driver.c ****         case 'L':
+ 135:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 136:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 137:Core/Src/PCF8551ATT_Driver.c ****         case 'm':
+ 138:Core/Src/PCF8551ATT_Driver.c ****         case 'M':
+ 139:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 140:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 141:Core/Src/PCF8551ATT_Driver.c ****         case 'n':
+ 142:Core/Src/PCF8551ATT_Driver.c ****         case 'N':
+ 143:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 144:Core/Src/PCF8551ATT_Driver.c ****             break;
+ARM GAS  /tmp/ccL8eWVw.s 			page 4
+
+
+ 145:Core/Src/PCF8551ATT_Driver.c ****         case 'o':
+ 146:Core/Src/PCF8551ATT_Driver.c ****         case 'O':
+ 147:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 148:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 149:Core/Src/PCF8551ATT_Driver.c ****         case 'p':
+ 150:Core/Src/PCF8551ATT_Driver.c ****         case 'P':
+ 151:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 152:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 153:Core/Src/PCF8551ATT_Driver.c ****         case 'q':
+ 154:Core/Src/PCF8551ATT_Driver.c ****         case 'Q':
+ 155:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 156:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 157:Core/Src/PCF8551ATT_Driver.c ****         case 'r':
+ 158:Core/Src/PCF8551ATT_Driver.c ****         case 'R':
+ 159:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 160:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 161:Core/Src/PCF8551ATT_Driver.c ****         case 's':
+ 162:Core/Src/PCF8551ATT_Driver.c ****         case 'S':
+ 163:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 164:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 165:Core/Src/PCF8551ATT_Driver.c ****         case 't':
+ 166:Core/Src/PCF8551ATT_Driver.c ****         case 'T':
+ 167:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 168:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 169:Core/Src/PCF8551ATT_Driver.c ****         case 'u':
+ 170:Core/Src/PCF8551ATT_Driver.c ****         case 'U':
+ 171:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 172:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 173:Core/Src/PCF8551ATT_Driver.c ****         case 'v':
+ 174:Core/Src/PCF8551ATT_Driver.c ****         case 'V':
+ 175:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 176:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 177:Core/Src/PCF8551ATT_Driver.c ****         case 'w':
+ 178:Core/Src/PCF8551ATT_Driver.c ****         case 'W':
+ 179:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 180:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 181:Core/Src/PCF8551ATT_Driver.c ****         case 'x':
+ 182:Core/Src/PCF8551ATT_Driver.c ****         case 'X':
+ 183:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 184:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 185:Core/Src/PCF8551ATT_Driver.c ****         case 'y':
+ 186:Core/Src/PCF8551ATT_Driver.c ****         case 'Y':
+ 187:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 188:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 189:Core/Src/PCF8551ATT_Driver.c ****         case 'z':
+ 190:Core/Src/PCF8551ATT_Driver.c ****         case 'Z':
+ 191:Core/Src/PCF8551ATT_Driver.c ****             segVal = 0x00;
+ 192:Core/Src/PCF8551ATT_Driver.c ****             break;
+ 193:Core/Src/PCF8551ATT_Driver.c ****     }
+ 194:Core/Src/PCF8551ATT_Driver.c ****     if (invertOutput) {
+ 195:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 196:Core/Src/PCF8551ATT_Driver.c ****     }
+ 197:Core/Src/PCF8551ATT_Driver.c ****     return segVal;
+ 198:Core/Src/PCF8551ATT_Driver.c **** }
+ 199:Core/Src/PCF8551ATT_Driver.c **** 
+ 200:Core/Src/PCF8551ATT_Driver.c **** uint32_t GetPortValueFromDigits(uint8_t digit0, uint8_t digit1, uint8_t digit2, uint8_t digit3, uin
+ 201:Core/Src/PCF8551ATT_Driver.c **** {   
+ARM GAS  /tmp/ccL8eWVw.s 			page 5
+
+
+ 202:Core/Src/PCF8551ATT_Driver.c ****     uint32_t portValue;
+ 203:Core/Src/PCF8551ATT_Driver.c ****     portValue = GetSegmentValueFromDigit(digit0, 0);
+ 204:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit1, 0) << 8;
+ 205:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit2, 0) << 16;
+ 206:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit3, 0) << 24;
+ 207:Core/Src/PCF8551ATT_Driver.c ****     
+ 208:Core/Src/PCF8551ATT_Driver.c ****     return portValue;
+ 209:Core/Src/PCF8551ATT_Driver.c **** }
+ 210:Core/Src/PCF8551ATT_Driver.c **** 
+ 211:Core/Src/PCF8551ATT_Driver.c **** uint32_t GetPortValueFromCharacters(char digit0, char digit1, char digit2, char digit3, char dots) 
+ 212:Core/Src/PCF8551ATT_Driver.c **** {
+ 213:Core/Src/PCF8551ATT_Driver.c ****     uint32_t portValue;
+ 214:Core/Src/PCF8551ATT_Driver.c ****     portValue = GetSegmentValueFromCharacter(digit0, 0);
+ 215:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit1, 0) << 8;
+ 216:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit2, 0) << 16;
+ 217:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit3, 0) << 24;
+ 218:Core/Src/PCF8551ATT_Driver.c ****     
+ 219:Core/Src/PCF8551ATT_Driver.c ****     return portValue;
+ 220:Core/Src/PCF8551ATT_Driver.c **** }
+ 221:Core/Src/PCF8551ATT_Driver.c **** 
+ 222:Core/Src/PCF8551ATT_Driver.c **** uint8_t WriteRegister_PCF8551(uint8_t addr, uint8_t reg, uint8_t value, SMBUS_HandleTypeDef *I2C) 
+ 223:Core/Src/PCF8551ATT_Driver.c **** {
+  29              		.loc 1 223 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 223 1 is_stmt 0 view .LVU1
+  34 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 20
+  37              		.cfi_offset 4, -20
+  38              		.cfi_offset 5, -16
+  39              		.cfi_offset 6, -12
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42 0002 87B0     		sub	sp, sp, #28
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_offset 48
+  45 0004 0646     		mov	r6, r0
+  46 0006 0F46     		mov	r7, r1
+  47 0008 1D46     		mov	r5, r3
+ 224:Core/Src/PCF8551ATT_Driver.c ****     uint8_t buffer[1];
+  48              		.loc 1 224 5 is_stmt 1 view .LVU2
+ 225:Core/Src/PCF8551ATT_Driver.c ****     buffer[0] = value;
+  49              		.loc 1 225 5 view .LVU3
+  50              		.loc 1 225 15 is_stmt 0 view .LVU4
+  51 000a 8DF81420 		strb	r2, [sp, #20]
+ 226:Core/Src/PCF8551ATT_Driver.c **** 
+ 227:Core/Src/PCF8551ATT_Driver.c ****     HAL_StatusTypeDef status = HAL_OK;
+  52              		.loc 1 227 5 is_stmt 1 view .LVU5
+  53              	.LVL1:
+ 228:Core/Src/PCF8551ATT_Driver.c ****     while (HAL_I2C_IsDeviceReady(I2C, addr, PCF8551_READY_TRIALS, PCF8551_Timeout) != HAL_OK);
+  54              		.loc 1 228 5 view .LVU6
+  55              	.L2:
+  56              		.loc 1 228 94 discriminator 1 view .LVU7
+  57              		.loc 1 228 11 discriminator 1 view .LVU8
+  58              		.loc 1 228 12 is_stmt 0 discriminator 1 view .LVU9
+ARM GAS  /tmp/ccL8eWVw.s 			page 6
+
+
+  59 000e B4B2     		uxth	r4, r6
+  60 0010 4FF47A73 		mov	r3, #1000
+  61 0014 6422     		movs	r2, #100
+  62 0016 2146     		mov	r1, r4
+  63 0018 2846     		mov	r0, r5
+  64 001a FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+  65              	.LVL2:
+  66              		.loc 1 228 11 discriminator 1 view .LVU10
+  67 001e 0028     		cmp	r0, #0
+  68 0020 F5D1     		bne	.L2
+ 229:Core/Src/PCF8551ATT_Driver.c ****     
+ 230:Core/Src/PCF8551ATT_Driver.c ****     status = HAL_I2C_Mem_Write(I2C, addr, reg, I2C_MEMADD_SIZE_8BIT, buffer, 1, PCF8551_Timeout);
+  69              		.loc 1 230 5 is_stmt 1 view .LVU11
+  70              		.loc 1 230 14 is_stmt 0 view .LVU12
+  71 0022 4FF47A73 		mov	r3, #1000
+  72 0026 0293     		str	r3, [sp, #8]
+  73 0028 0123     		movs	r3, #1
+  74 002a 0193     		str	r3, [sp, #4]
+  75 002c 05AA     		add	r2, sp, #20
+  76 002e 0092     		str	r2, [sp]
+  77 0030 3A46     		mov	r2, r7
+  78 0032 2146     		mov	r1, r4
+  79 0034 2846     		mov	r0, r5
+  80 0036 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+  81              	.LVL3:
+ 231:Core/Src/PCF8551ATT_Driver.c ****     
+ 232:Core/Src/PCF8551ATT_Driver.c ****     if (status == HAL_OK)
+  82              		.loc 1 232 5 is_stmt 1 view .LVU13
+  83              		.loc 1 232 8 is_stmt 0 view .LVU14
+  84 003a 00B1     		cbz	r0, .L3
+ 233:Core/Src/PCF8551ATT_Driver.c ****     {
+ 234:Core/Src/PCF8551ATT_Driver.c ****         return PCF8551_SUCCESS;
+ 235:Core/Src/PCF8551ATT_Driver.c ****     }
+ 236:Core/Src/PCF8551ATT_Driver.c ****     return PCF8551_FAILURE;
+  85              		.loc 1 236 12 view .LVU15
+  86 003c 0120     		movs	r0, #1
+  87              	.LVL4:
+  88              	.L3:
+ 237:Core/Src/PCF8551ATT_Driver.c **** }
+  89              		.loc 1 237 1 view .LVU16
+  90 003e 07B0     		add	sp, sp, #28
+  91              	.LCFI2:
+  92              		.cfi_def_cfa_offset 20
+  93              		@ sp needed
+  94 0040 F0BD     		pop	{r4, r5, r6, r7, pc}
+  95              		.loc 1 237 1 view .LVU17
+  96              		.cfi_endproc
+  97              	.LFE137:
+  99              		.section	.text.WriteMultipleRegister_PCF8551,"ax",%progbits
+ 100              		.align	1
+ 101              		.syntax unified
+ 102              		.thumb
+ 103              		.thumb_func
+ 104              		.fpu fpv4-sp-d16
+ 106              	WriteMultipleRegister_PCF8551:
+ 107              	.LVL5:
+ 108              	.LFB138:
+ARM GAS  /tmp/ccL8eWVw.s 			page 7
+
+
+ 238:Core/Src/PCF8551ATT_Driver.c **** 
+ 239:Core/Src/PCF8551ATT_Driver.c **** uint8_t WriteMultipleRegister_PCF8551(uint8_t addr, uint8_t reg, uint8_t *value, uint8_t num, SMBUS
+ 240:Core/Src/PCF8551ATT_Driver.c **** {
+ 109              		.loc 1 240 1 is_stmt 1 view -0
+ 110              		.cfi_startproc
+ 111              		@ args = 4, pretend = 0, frame = 0
+ 112              		@ frame_needed = 0, uses_anonymous_args = 0
+ 113              		.loc 1 240 1 is_stmt 0 view .LVU19
+ 114 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 115              	.LCFI3:
+ 116              		.cfi_def_cfa_offset 28
+ 117              		.cfi_offset 4, -28
+ 118              		.cfi_offset 5, -24
+ 119              		.cfi_offset 6, -20
+ 120              		.cfi_offset 7, -16
+ 121              		.cfi_offset 8, -12
+ 122              		.cfi_offset 9, -8
+ 123              		.cfi_offset 14, -4
+ 124 0004 85B0     		sub	sp, sp, #20
+ 125              	.LCFI4:
+ 126              		.cfi_def_cfa_offset 48
+ 127 0006 0546     		mov	r5, r0
+ 128 0008 0F46     		mov	r7, r1
+ 129 000a 9046     		mov	r8, r2
+ 130 000c 9946     		mov	r9, r3
+ 131 000e 0C9E     		ldr	r6, [sp, #48]
+ 241:Core/Src/PCF8551ATT_Driver.c **** 
+ 242:Core/Src/PCF8551ATT_Driver.c ****     HAL_StatusTypeDef status = HAL_OK;
+ 132              		.loc 1 242 5 is_stmt 1 view .LVU20
+ 133              	.LVL6:
+ 243:Core/Src/PCF8551ATT_Driver.c ****     while (HAL_I2C_IsDeviceReady(I2C, addr, PCF8551_READY_TRIALS, PCF8551_Timeout) != HAL_OK);
+ 134              		.loc 1 243 5 view .LVU21
+ 135              	.L6:
+ 136              		.loc 1 243 94 discriminator 1 view .LVU22
+ 137              		.loc 1 243 11 discriminator 1 view .LVU23
+ 138              		.loc 1 243 12 is_stmt 0 discriminator 1 view .LVU24
+ 139 0010 ACB2     		uxth	r4, r5
+ 140 0012 4FF47A73 		mov	r3, #1000
+ 141 0016 6422     		movs	r2, #100
+ 142 0018 2146     		mov	r1, r4
+ 143 001a 3046     		mov	r0, r6
+ 144 001c FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+ 145              	.LVL7:
+ 146              		.loc 1 243 11 discriminator 1 view .LVU25
+ 147 0020 0028     		cmp	r0, #0
+ 148 0022 F5D1     		bne	.L6
+ 244:Core/Src/PCF8551ATT_Driver.c ****     
+ 245:Core/Src/PCF8551ATT_Driver.c ****     status = HAL_I2C_Mem_Write(I2C, addr, reg, I2C_MEMADD_SIZE_8BIT, value, num, PCF8551_Timeout);
+ 149              		.loc 1 245 5 is_stmt 1 view .LVU26
+ 150              		.loc 1 245 14 is_stmt 0 view .LVU27
+ 151 0024 4FF47A73 		mov	r3, #1000
+ 152 0028 0293     		str	r3, [sp, #8]
+ 153 002a CDF80490 		str	r9, [sp, #4]
+ 154 002e CDF80080 		str	r8, [sp]
+ 155 0032 0123     		movs	r3, #1
+ 156 0034 3A46     		mov	r2, r7
+ 157 0036 2146     		mov	r1, r4
+ARM GAS  /tmp/ccL8eWVw.s 			page 8
+
+
+ 158 0038 3046     		mov	r0, r6
+ 159 003a FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 160              	.LVL8:
+ 246:Core/Src/PCF8551ATT_Driver.c ****     
+ 247:Core/Src/PCF8551ATT_Driver.c ****     if (status == HAL_OK)
+ 161              		.loc 1 247 5 is_stmt 1 view .LVU28
+ 162              		.loc 1 247 8 is_stmt 0 view .LVU29
+ 163 003e 00B1     		cbz	r0, .L7
+ 248:Core/Src/PCF8551ATT_Driver.c ****     {
+ 249:Core/Src/PCF8551ATT_Driver.c ****         return PCF8551_SUCCESS;
+ 250:Core/Src/PCF8551ATT_Driver.c ****     }
+ 251:Core/Src/PCF8551ATT_Driver.c ****     return PCF8551_FAILURE;
+ 164              		.loc 1 251 12 view .LVU30
+ 165 0040 0120     		movs	r0, #1
+ 166              	.LVL9:
+ 167              	.L7:
+ 252:Core/Src/PCF8551ATT_Driver.c **** }
+ 168              		.loc 1 252 1 view .LVU31
+ 169 0042 05B0     		add	sp, sp, #20
+ 170              	.LCFI5:
+ 171              		.cfi_def_cfa_offset 28
+ 172              		@ sp needed
+ 173 0044 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 174              		.loc 1 252 1 view .LVU32
+ 175              		.cfi_endproc
+ 176              	.LFE138:
+ 178              		.section	.text.Init_PCF8551,"ax",%progbits
+ 179              		.align	1
+ 180              		.global	Init_PCF8551
+ 181              		.syntax unified
+ 182              		.thumb
+ 183              		.thumb_func
+ 184              		.fpu fpv4-sp-d16
+ 186              	Init_PCF8551:
+ 187              	.LVL10:
+ 188              	.LFB130:
+   9:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = PCF8551_SUCCESS;
+ 189              		.loc 1 9 1 is_stmt 1 view -0
+ 190              		.cfi_startproc
+ 191              		@ args = 0, pretend = 0, frame = 0
+ 192              		@ frame_needed = 0, uses_anonymous_args = 0
+   9:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = PCF8551_SUCCESS;
+ 193              		.loc 1 9 1 is_stmt 0 view .LVU34
+ 194 0000 70B5     		push	{r4, r5, r6, lr}
+ 195              	.LCFI6:
+ 196              		.cfi_def_cfa_offset 16
+ 197              		.cfi_offset 4, -16
+ 198              		.cfi_offset 5, -12
+ 199              		.cfi_offset 6, -8
+ 200              		.cfi_offset 14, -4
+ 201 0002 0446     		mov	r4, r0
+ 202 0004 0D46     		mov	r5, r1
+  10:Core/Src/PCF8551ATT_Driver.c ****     DEVICE_ADDR = configuration->DEV_ADDR;
+ 203              		.loc 1 10 5 is_stmt 1 view .LVU35
+ 204              	.LVL11:
+  11:Core/Src/PCF8551ATT_Driver.c ****     uint8_t devCtlReg = !!configuration->CLOCK_OUT_ENABLED;
+ 205              		.loc 1 11 5 view .LVU36
+ARM GAS  /tmp/ccL8eWVw.s 			page 9
+
+
+  11:Core/Src/PCF8551ATT_Driver.c ****     uint8_t devCtlReg = !!configuration->CLOCK_OUT_ENABLED;
+ 206              		.loc 1 11 32 is_stmt 0 view .LVU37
+ 207 0006 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 208              	.LVL12:
+  11:Core/Src/PCF8551ATT_Driver.c ****     uint8_t devCtlReg = !!configuration->CLOCK_OUT_ENABLED;
+ 209              		.loc 1 11 17 view .LVU38
+ 210 0008 174E     		ldr	r6, .L11
+ 211 000a 3070     		strb	r0, [r6]
+  12:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->INT_OSC_ENABLED << 1;
+ 212              		.loc 1 12 5 is_stmt 1 view .LVU39
+  12:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->INT_OSC_ENABLED << 1;
+ 213              		.loc 1 12 40 is_stmt 0 view .LVU40
+ 214 000c E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 215              	.LVL13:
+  13:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->FRAME_FREQ << 2;
+ 216              		.loc 1 13 5 is_stmt 1 view .LVU41
+  13:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->FRAME_FREQ << 2;
+ 217              		.loc 1 13 31 is_stmt 0 view .LVU42
+ 218 000e A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+  13:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->FRAME_FREQ << 2;
+ 219              		.loc 1 13 49 view .LVU43
+ 220 0010 5200     		lsls	r2, r2, #1
+  13:Core/Src/PCF8551ATT_Driver.c ****     devCtlReg |= configuration->FRAME_FREQ << 2;
+ 221              		.loc 1 13 15 view .LVU44
+ 222 0012 002B     		cmp	r3, #0
+ 223 0014 18BF     		it	ne
+ 224 0016 42F00102 		orrne	r2, r2, #1
+ 225 001a 52B2     		sxtb	r2, r2
+ 226              	.LVL14:
+  14:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DEVICE_CTL_REG, devCtlReg, I2C);
+ 227              		.loc 1 14 5 is_stmt 1 view .LVU45
+  14:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DEVICE_CTL_REG, devCtlReg, I2C);
+ 228              		.loc 1 14 31 is_stmt 0 view .LVU46
+ 229 001c 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+  14:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DEVICE_CTL_REG, devCtlReg, I2C);
+ 230              		.loc 1 14 15 view .LVU47
+ 231 001e 42EA8302 		orr	r2, r2, r3, lsl #2
+ 232              	.LVL15:
+  15:Core/Src/PCF8551ATT_Driver.c ****     uint8_t displayCtlReg = configuration->DISPLAY_ENABLE;
+ 233              		.loc 1 15 5 is_stmt 1 view .LVU48
+  15:Core/Src/PCF8551ATT_Driver.c ****     uint8_t displayCtlReg = configuration->DISPLAY_ENABLE;
+ 234              		.loc 1 15 15 is_stmt 0 view .LVU49
+ 235 0022 0B46     		mov	r3, r1
+ 236 0024 D2B2     		uxtb	r2, r2
+  15:Core/Src/PCF8551ATT_Driver.c ****     uint8_t displayCtlReg = configuration->DISPLAY_ENABLE;
+ 237              		.loc 1 15 15 view .LVU50
+ 238 0026 0121     		movs	r1, #1
+ 239              	.LVL16:
+  15:Core/Src/PCF8551ATT_Driver.c ****     uint8_t displayCtlReg = configuration->DISPLAY_ENABLE;
+ 240              		.loc 1 15 15 view .LVU51
+ 241 0028 FFF7FEFF 		bl	WriteRegister_PCF8551
+ 242              	.LVL17:
+  16:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BIAS_MODE << 1;
+ 243              		.loc 1 16 5 is_stmt 1 view .LVU52
+  16:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BIAS_MODE << 1;
+ 244              		.loc 1 16 13 is_stmt 0 view .LVU53
+ 245 002c E279     		ldrb	r2, [r4, #7]	@ zero_extendqisi2
+ARM GAS  /tmp/ccL8eWVw.s 			page 10
+
+
+ 246              	.LVL18:
+  17:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->DRIVE_MODE << 2;
+ 247              		.loc 1 17 5 is_stmt 1 view .LVU54
+  17:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->DRIVE_MODE << 2;
+ 248              		.loc 1 17 35 is_stmt 0 view .LVU55
+ 249 002e A379     		ldrb	r3, [r4, #6]	@ zero_extendqisi2
+  17:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->DRIVE_MODE << 2;
+ 250              		.loc 1 17 19 view .LVU56
+ 251 0030 42EA4302 		orr	r2, r2, r3, lsl #1
+ 252              	.LVL19:
+  17:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->DRIVE_MODE << 2;
+ 253              		.loc 1 17 19 view .LVU57
+ 254 0034 52B2     		sxtb	r2, r2
+ 255              	.LVL20:
+  18:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BOOST << 4;
+ 256              		.loc 1 18 5 is_stmt 1 view .LVU58
+  18:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BOOST << 4;
+ 257              		.loc 1 18 35 is_stmt 0 view .LVU59
+ 258 0036 2379     		ldrb	r3, [r4, #4]	@ zero_extendqisi2
+  18:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BOOST << 4;
+ 259              		.loc 1 18 19 view .LVU60
+ 260 0038 42EA8302 		orr	r2, r2, r3, lsl #2
+ 261              	.LVL21:
+  18:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BOOST << 4;
+ 262              		.loc 1 18 19 view .LVU61
+ 263 003c 52B2     		sxtb	r2, r2
+ 264              	.LVL22:
+  19:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_1, displayCtlReg, I2C);
+ 265              		.loc 1 19 5 is_stmt 1 view .LVU62
+  19:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_1, displayCtlReg, I2C);
+ 266              		.loc 1 19 35 is_stmt 0 view .LVU63
+ 267 003e 6379     		ldrb	r3, [r4, #5]	@ zero_extendqisi2
+  19:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_1, displayCtlReg, I2C);
+ 268              		.loc 1 19 19 view .LVU64
+ 269 0040 42EA0312 		orr	r2, r2, r3, lsl #4
+ 270              	.LVL23:
+  20:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg = configuration->INVERSION_MODE;
+ 271              		.loc 1 20 5 is_stmt 1 view .LVU65
+  20:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg = configuration->INVERSION_MODE;
+ 272              		.loc 1 20 15 is_stmt 0 view .LVU66
+ 273 0044 2B46     		mov	r3, r5
+ 274 0046 D2B2     		uxtb	r2, r2
+  20:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg = configuration->INVERSION_MODE;
+ 275              		.loc 1 20 15 view .LVU67
+ 276 0048 0221     		movs	r1, #2
+ 277 004a 3078     		ldrb	r0, [r6]	@ zero_extendqisi2
+ 278 004c FFF7FEFF 		bl	WriteRegister_PCF8551
+ 279              	.LVL24:
+  21:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BLINK << 1;
+ 280              		.loc 1 21 5 is_stmt 1 view .LVU68
+  21:Core/Src/PCF8551ATT_Driver.c ****     displayCtlReg |= configuration->BLINK << 1;
+ 281              		.loc 1 21 19 is_stmt 0 view .LVU69
+ 282 0050 627A     		ldrb	r2, [r4, #9]	@ zero_extendqisi2
+ 283              	.LVL25:
+  22:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_2, displayCtlReg, I2C);
+ 284              		.loc 1 22 5 is_stmt 1 view .LVU70
+  22:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_2, displayCtlReg, I2C);
+ARM GAS  /tmp/ccL8eWVw.s 			page 11
+
+
+ 285              		.loc 1 22 35 is_stmt 0 view .LVU71
+ 286 0052 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+  22:Core/Src/PCF8551ATT_Driver.c ****     status &= WriteRegister_PCF8551(DEVICE_ADDR, PCF8551_DISPLAY_CTL_2, displayCtlReg, I2C);
+ 287              		.loc 1 22 19 view .LVU72
+ 288 0054 42EA4302 		orr	r2, r2, r3, lsl #1
+ 289              	.LVL26:
+  23:Core/Src/PCF8551ATT_Driver.c ****     return status;
+ 290              		.loc 1 23 5 is_stmt 1 view .LVU73
+  23:Core/Src/PCF8551ATT_Driver.c ****     return status;
+ 291              		.loc 1 23 15 is_stmt 0 view .LVU74
+ 292 0058 2B46     		mov	r3, r5
+ 293 005a D2B2     		uxtb	r2, r2
+  23:Core/Src/PCF8551ATT_Driver.c ****     return status;
+ 294              		.loc 1 23 15 view .LVU75
+ 295 005c 0321     		movs	r1, #3
+ 296 005e 3078     		ldrb	r0, [r6]	@ zero_extendqisi2
+ 297 0060 FFF7FEFF 		bl	WriteRegister_PCF8551
+ 298              	.LVL27:
+  24:Core/Src/PCF8551ATT_Driver.c **** }
+ 299              		.loc 1 24 5 is_stmt 1 view .LVU76
+  25:Core/Src/PCF8551ATT_Driver.c **** 
+ 300              		.loc 1 25 1 is_stmt 0 view .LVU77
+ 301 0064 0020     		movs	r0, #0
+ 302 0066 70BD     		pop	{r4, r5, r6, pc}
+ 303              	.LVL28:
+ 304              	.L12:
+  25:Core/Src/PCF8551ATT_Driver.c **** 
+ 305              		.loc 1 25 1 view .LVU78
+ 306              		.align	2
+ 307              	.L11:
+ 308 0068 00000000 		.word	.LANCHOR0
+ 309              		.cfi_endproc
+ 310              	.LFE130:
+ 312              		.section	.text.WriteSegment_PCF8551,"ax",%progbits
+ 313              		.align	1
+ 314              		.global	WriteSegment_PCF8551
+ 315              		.syntax unified
+ 316              		.thumb
+ 317              		.thumb_func
+ 318              		.fpu fpv4-sp-d16
+ 320              	WriteSegment_PCF8551:
+ 321              	.LVL29:
+ 322              	.LFB131:
+  28:Core/Src/PCF8551ATT_Driver.c ****     uint8_t reg = (port + 1) * (uint8_t) PCF8551_COM0_SEG0 + (uint8_t) segment;
+ 323              		.loc 1 28 1 is_stmt 1 view -0
+ 324              		.cfi_startproc
+ 325              		@ args = 0, pretend = 0, frame = 0
+ 326              		@ frame_needed = 0, uses_anonymous_args = 0
+  28:Core/Src/PCF8551ATT_Driver.c ****     uint8_t reg = (port + 1) * (uint8_t) PCF8551_COM0_SEG0 + (uint8_t) segment;
+ 327              		.loc 1 28 1 is_stmt 0 view .LVU80
+ 328 0000 08B5     		push	{r3, lr}
+ 329              	.LCFI7:
+ 330              		.cfi_def_cfa_offset 8
+ 331              		.cfi_offset 3, -8
+ 332              		.cfi_offset 14, -4
+  29:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = WriteRegister_PCF8551(DEVICE_ADDR, reg, value, I2C);
+ 333              		.loc 1 29 5 is_stmt 1 view .LVU81
+ARM GAS  /tmp/ccL8eWVw.s 			page 12
+
+
+  29:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = WriteRegister_PCF8551(DEVICE_ADDR, reg, value, I2C);
+ 334              		.loc 1 29 60 is_stmt 0 view .LVU82
+ 335 0002 0130     		adds	r0, r0, #1
+ 336              	.LVL30:
+  29:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = WriteRegister_PCF8551(DEVICE_ADDR, reg, value, I2C);
+ 337              		.loc 1 29 60 view .LVU83
+ 338 0004 8000     		lsls	r0, r0, #2
+ 339 0006 C0B2     		uxtb	r0, r0
+  29:Core/Src/PCF8551ATT_Driver.c ****     uint8_t status = WriteRegister_PCF8551(DEVICE_ADDR, reg, value, I2C);
+ 340              		.loc 1 29 13 view .LVU84
+ 341 0008 0144     		add	r1, r1, r0
+ 342              	.LVL31:
+  30:Core/Src/PCF8551ATT_Driver.c ****     return status;
+ 343              		.loc 1 30 5 is_stmt 1 view .LVU85
+  30:Core/Src/PCF8551ATT_Driver.c ****     return status;
+ 344              		.loc 1 30 22 is_stmt 0 view .LVU86
+ 345 000a C9B2     		uxtb	r1, r1
+  30:Core/Src/PCF8551ATT_Driver.c ****     return status;
+ 346              		.loc 1 30 22 view .LVU87
+ 347 000c 0248     		ldr	r0, .L15
+ 348 000e 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 349 0010 FFF7FEFF 		bl	WriteRegister_PCF8551
+ 350              	.LVL32:
+  31:Core/Src/PCF8551ATT_Driver.c **** }
+ 351              		.loc 1 31 5 is_stmt 1 view .LVU88
+  32:Core/Src/PCF8551ATT_Driver.c **** 
+ 352              		.loc 1 32 1 is_stmt 0 view .LVU89
+ 353 0014 08BD     		pop	{r3, pc}
+ 354              	.L16:
+ 355 0016 00BF     		.align	2
+ 356              	.L15:
+ 357 0018 00000000 		.word	.LANCHOR0
+ 358              		.cfi_endproc
+ 359              	.LFE131:
+ 361              		.section	.text.WritePort_PCF8551,"ax",%progbits
+ 362              		.align	1
+ 363              		.global	WritePort_PCF8551
+ 364              		.syntax unified
+ 365              		.thumb
+ 366              		.thumb_func
+ 367              		.fpu fpv4-sp-d16
+ 369              	WritePort_PCF8551:
+ 370              	.LVL33:
+ 371              	.LFB132:
+  35:Core/Src/PCF8551ATT_Driver.c ****     uint8_t buffer[4];
+ 372              		.loc 1 35 1 is_stmt 1 view -0
+ 373              		.cfi_startproc
+ 374              		@ args = 0, pretend = 0, frame = 8
+ 375              		@ frame_needed = 0, uses_anonymous_args = 0
+  35:Core/Src/PCF8551ATT_Driver.c ****     uint8_t buffer[4];
+ 376              		.loc 1 35 1 is_stmt 0 view .LVU91
+ 377 0000 00B5     		push	{lr}
+ 378              	.LCFI8:
+ 379              		.cfi_def_cfa_offset 4
+ 380              		.cfi_offset 14, -4
+ 381 0002 85B0     		sub	sp, sp, #20
+ 382              	.LCFI9:
+ARM GAS  /tmp/ccL8eWVw.s 			page 13
+
+
+ 383              		.cfi_def_cfa_offset 24
+  36:Core/Src/PCF8551ATT_Driver.c ****     buffer[0] = value;
+ 384              		.loc 1 36 5 is_stmt 1 view .LVU92
+  37:Core/Src/PCF8551ATT_Driver.c ****     buffer[1] = value >> 8;
+ 385              		.loc 1 37 5 view .LVU93
+  37:Core/Src/PCF8551ATT_Driver.c ****     buffer[1] = value >> 8;
+ 386              		.loc 1 37 15 is_stmt 0 view .LVU94
+ 387 0004 8DF80C10 		strb	r1, [sp, #12]
+  38:Core/Src/PCF8551ATT_Driver.c ****     buffer[2] = value >> 16;
+ 388              		.loc 1 38 5 is_stmt 1 view .LVU95
+  38:Core/Src/PCF8551ATT_Driver.c ****     buffer[2] = value >> 16;
+ 389              		.loc 1 38 23 is_stmt 0 view .LVU96
+ 390 0008 0B0A     		lsrs	r3, r1, #8
+  38:Core/Src/PCF8551ATT_Driver.c ****     buffer[2] = value >> 16;
+ 391              		.loc 1 38 15 view .LVU97
+ 392 000a 8DF80D30 		strb	r3, [sp, #13]
+  39:Core/Src/PCF8551ATT_Driver.c ****     buffer[3] = value >> 24;
+ 393              		.loc 1 39 5 is_stmt 1 view .LVU98
+  39:Core/Src/PCF8551ATT_Driver.c ****     buffer[3] = value >> 24;
+ 394              		.loc 1 39 23 is_stmt 0 view .LVU99
+ 395 000e 0B0C     		lsrs	r3, r1, #16
+  39:Core/Src/PCF8551ATT_Driver.c ****     buffer[3] = value >> 24;
+ 396              		.loc 1 39 15 view .LVU100
+ 397 0010 8DF80E30 		strb	r3, [sp, #14]
+  40:Core/Src/PCF8551ATT_Driver.c **** 
+ 398              		.loc 1 40 5 is_stmt 1 view .LVU101
+  40:Core/Src/PCF8551ATT_Driver.c **** 
+ 399              		.loc 1 40 23 is_stmt 0 view .LVU102
+ 400 0014 090E     		lsrs	r1, r1, #24
+ 401              	.LVL34:
+  40:Core/Src/PCF8551ATT_Driver.c **** 
+ 402              		.loc 1 40 15 view .LVU103
+ 403 0016 8DF80F10 		strb	r1, [sp, #15]
+  42:Core/Src/PCF8551ATT_Driver.c **** 
+ 404              		.loc 1 42 5 is_stmt 1 view .LVU104
+  42:Core/Src/PCF8551ATT_Driver.c **** 
+ 405              		.loc 1 42 13 is_stmt 0 view .LVU105
+ 406 001a 0130     		adds	r0, r0, #1
+ 407              	.LVL35:
+  42:Core/Src/PCF8551ATT_Driver.c **** 
+ 408              		.loc 1 42 13 view .LVU106
+ 409 001c 8100     		lsls	r1, r0, #2
+ 410              	.LVL36:
+  44:Core/Src/PCF8551ATT_Driver.c **** }
+ 411              		.loc 1 44 5 is_stmt 1 view .LVU107
+  44:Core/Src/PCF8551ATT_Driver.c **** }
+ 412              		.loc 1 44 12 is_stmt 0 view .LVU108
+ 413 001e 0092     		str	r2, [sp]
+ 414 0020 0423     		movs	r3, #4
+ 415 0022 03AA     		add	r2, sp, #12
+ 416              	.LVL37:
+  44:Core/Src/PCF8551ATT_Driver.c **** }
+ 417              		.loc 1 44 12 view .LVU109
+ 418 0024 01F0FC01 		and	r1, r1, #252
+ 419              	.LVL38:
+  44:Core/Src/PCF8551ATT_Driver.c **** }
+ 420              		.loc 1 44 12 view .LVU110
+ARM GAS  /tmp/ccL8eWVw.s 			page 14
+
+
+ 421 0028 0348     		ldr	r0, .L19
+ 422              	.LVL39:
+  44:Core/Src/PCF8551ATT_Driver.c **** }
+ 423              		.loc 1 44 12 view .LVU111
+ 424 002a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 425 002c FFF7FEFF 		bl	WriteMultipleRegister_PCF8551
+ 426              	.LVL40:
+  45:Core/Src/PCF8551ATT_Driver.c **** 
+ 427              		.loc 1 45 1 view .LVU112
+ 428 0030 05B0     		add	sp, sp, #20
+ 429              	.LCFI10:
+ 430              		.cfi_def_cfa_offset 4
+ 431              		@ sp needed
+ 432 0032 5DF804FB 		ldr	pc, [sp], #4
+ 433              	.L20:
+ 434 0036 00BF     		.align	2
+ 435              	.L19:
+ 436 0038 00000000 		.word	.LANCHOR0
+ 437              		.cfi_endproc
+ 438              	.LFE132:
+ 440              		.section	.text.GetSegmentValueFromDigit,"ax",%progbits
+ 441              		.align	1
+ 442              		.global	GetSegmentValueFromDigit
+ 443              		.syntax unified
+ 444              		.thumb
+ 445              		.thumb_func
+ 446              		.fpu fpv4-sp-d16
+ 448              	GetSegmentValueFromDigit:
+ 449              	.LVL41:
+ 450              	.LFB133:
+  48:Core/Src/PCF8551ATT_Driver.c ****     uint8_t segVal = 0x00;
+ 451              		.loc 1 48 1 is_stmt 1 view -0
+ 452              		.cfi_startproc
+ 453              		@ args = 0, pretend = 0, frame = 0
+ 454              		@ frame_needed = 0, uses_anonymous_args = 0
+ 455              		@ link register save eliminated.
+  49:Core/Src/PCF8551ATT_Driver.c ****     switch(digit) {
+ 456              		.loc 1 49 5 view .LVU114
+  50:Core/Src/PCF8551ATT_Driver.c ****         case 1:
+ 457              		.loc 1 50 5 view .LVU115
+  79:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 458              		.loc 1 79 5 view .LVU116
+  79:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 459              		.loc 1 79 8 is_stmt 0 view .LVU117
+ 460 0000 0846     		mov	r0, r1
+ 461              	.LVL42:
+  79:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 462              		.loc 1 79 8 view .LVU118
+ 463 0002 01B9     		cbnz	r1, .L24
+ 464              	.L22:
+  83:Core/Src/PCF8551ATT_Driver.c **** 
+ 465              		.loc 1 83 1 view .LVU119
+ 466 0004 7047     		bx	lr
+ 467              	.L24:
+  80:Core/Src/PCF8551ATT_Driver.c ****     }
+ 468              		.loc 1 80 16 view .LVU120
+ 469 0006 FF20     		movs	r0, #255
+ARM GAS  /tmp/ccL8eWVw.s 			page 15
+
+
+ 470 0008 FCE7     		b	.L22
+ 471              		.cfi_endproc
+ 472              	.LFE133:
+ 474              		.section	.text.GetSegmentValueFromCharacter,"ax",%progbits
+ 475              		.align	1
+ 476              		.global	GetSegmentValueFromCharacter
+ 477              		.syntax unified
+ 478              		.thumb
+ 479              		.thumb_func
+ 480              		.fpu fpv4-sp-d16
+ 482              	GetSegmentValueFromCharacter:
+ 483              	.LVL43:
+ 484              	.LFB134:
+  86:Core/Src/PCF8551ATT_Driver.c ****     uint8_t segVal = 0x00;
+ 485              		.loc 1 86 1 is_stmt 1 view -0
+ 486              		.cfi_startproc
+ 487              		@ args = 0, pretend = 0, frame = 0
+ 488              		@ frame_needed = 0, uses_anonymous_args = 0
+ 489              		@ link register save eliminated.
+  87:Core/Src/PCF8551ATT_Driver.c ****     switch(character) {
+ 490              		.loc 1 87 5 view .LVU122
+  88:Core/Src/PCF8551ATT_Driver.c ****         case 'a':
+ 491              		.loc 1 88 5 view .LVU123
+ 194:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 492              		.loc 1 194 5 view .LVU124
+ 194:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 493              		.loc 1 194 8 is_stmt 0 view .LVU125
+ 494 0000 0846     		mov	r0, r1
+ 495              	.LVL44:
+ 194:Core/Src/PCF8551ATT_Driver.c ****         return ~segVal;
+ 496              		.loc 1 194 8 view .LVU126
+ 497 0002 01B9     		cbnz	r1, .L28
+ 498              	.L26:
+ 198:Core/Src/PCF8551ATT_Driver.c **** 
+ 499              		.loc 1 198 1 view .LVU127
+ 500 0004 7047     		bx	lr
+ 501              	.L28:
+ 195:Core/Src/PCF8551ATT_Driver.c ****     }
+ 502              		.loc 1 195 16 view .LVU128
+ 503 0006 FF20     		movs	r0, #255
+ 504 0008 FCE7     		b	.L26
+ 505              		.cfi_endproc
+ 506              	.LFE134:
+ 508              		.section	.text.GetPortValueFromDigits,"ax",%progbits
+ 509              		.align	1
+ 510              		.global	GetPortValueFromDigits
+ 511              		.syntax unified
+ 512              		.thumb
+ 513              		.thumb_func
+ 514              		.fpu fpv4-sp-d16
+ 516              	GetPortValueFromDigits:
+ 517              	.LVL45:
+ 518              	.LFB135:
+ 201:Core/Src/PCF8551ATT_Driver.c ****     uint32_t portValue;
+ 519              		.loc 1 201 1 is_stmt 1 view -0
+ 520              		.cfi_startproc
+ 521              		@ args = 4, pretend = 0, frame = 0
+ARM GAS  /tmp/ccL8eWVw.s 			page 16
+
+
+ 522              		@ frame_needed = 0, uses_anonymous_args = 0
+ 201:Core/Src/PCF8551ATT_Driver.c ****     uint32_t portValue;
+ 523              		.loc 1 201 1 is_stmt 0 view .LVU130
+ 524 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 525              	.LCFI11:
+ 526              		.cfi_def_cfa_offset 24
+ 527              		.cfi_offset 3, -24
+ 528              		.cfi_offset 4, -20
+ 529              		.cfi_offset 5, -16
+ 530              		.cfi_offset 6, -12
+ 531              		.cfi_offset 7, -8
+ 532              		.cfi_offset 14, -4
+ 533 0002 0F46     		mov	r7, r1
+ 534 0004 1646     		mov	r6, r2
+ 535 0006 1D46     		mov	r5, r3
+ 202:Core/Src/PCF8551ATT_Driver.c ****     portValue = GetSegmentValueFromDigit(digit0, 0);
+ 536              		.loc 1 202 5 is_stmt 1 view .LVU131
+ 203:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit1, 0) << 8;
+ 537              		.loc 1 203 5 view .LVU132
+ 203:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit1, 0) << 8;
+ 538              		.loc 1 203 17 is_stmt 0 view .LVU133
+ 539 0008 0021     		movs	r1, #0
+ 540              	.LVL46:
+ 203:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit1, 0) << 8;
+ 541              		.loc 1 203 17 view .LVU134
+ 542 000a FFF7FEFF 		bl	GetSegmentValueFromDigit
+ 543              	.LVL47:
+ 203:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit1, 0) << 8;
+ 544              		.loc 1 203 17 view .LVU135
+ 545 000e 0446     		mov	r4, r0
+ 546              	.LVL48:
+ 204:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit2, 0) << 16;
+ 547              		.loc 1 204 5 is_stmt 1 view .LVU136
+ 204:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit2, 0) << 16;
+ 548              		.loc 1 204 18 is_stmt 0 view .LVU137
+ 549 0010 0021     		movs	r1, #0
+ 550 0012 3846     		mov	r0, r7
+ 551              	.LVL49:
+ 204:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit2, 0) << 16;
+ 552              		.loc 1 204 18 view .LVU138
+ 553 0014 FFF7FEFF 		bl	GetSegmentValueFromDigit
+ 554              	.LVL50:
+ 204:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit2, 0) << 16;
+ 555              		.loc 1 204 15 view .LVU139
+ 556 0018 44EA0024 		orr	r4, r4, r0, lsl #8
+ 557              	.LVL51:
+ 205:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit3, 0) << 24;
+ 558              		.loc 1 205 5 is_stmt 1 view .LVU140
+ 205:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit3, 0) << 24;
+ 559              		.loc 1 205 18 is_stmt 0 view .LVU141
+ 560 001c 0021     		movs	r1, #0
+ 561 001e 3046     		mov	r0, r6
+ 562 0020 FFF7FEFF 		bl	GetSegmentValueFromDigit
+ 563              	.LVL52:
+ 205:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromDigit(digit3, 0) << 24;
+ 564              		.loc 1 205 15 view .LVU142
+ 565 0024 44EA0044 		orr	r4, r4, r0, lsl #16
+ARM GAS  /tmp/ccL8eWVw.s 			page 17
+
+
+ 566              	.LVL53:
+ 206:Core/Src/PCF8551ATT_Driver.c ****     
+ 567              		.loc 1 206 5 is_stmt 1 view .LVU143
+ 206:Core/Src/PCF8551ATT_Driver.c ****     
+ 568              		.loc 1 206 18 is_stmt 0 view .LVU144
+ 569 0028 0021     		movs	r1, #0
+ 570 002a 2846     		mov	r0, r5
+ 571 002c FFF7FEFF 		bl	GetSegmentValueFromDigit
+ 572              	.LVL54:
+ 208:Core/Src/PCF8551ATT_Driver.c **** }
+ 573              		.loc 1 208 5 is_stmt 1 view .LVU145
+ 209:Core/Src/PCF8551ATT_Driver.c **** 
+ 574              		.loc 1 209 1 is_stmt 0 view .LVU146
+ 575 0030 44EA0060 		orr	r0, r4, r0, lsl #24
+ 576              	.LVL55:
+ 209:Core/Src/PCF8551ATT_Driver.c **** 
+ 577              		.loc 1 209 1 view .LVU147
+ 578 0034 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 209:Core/Src/PCF8551ATT_Driver.c **** 
+ 579              		.loc 1 209 1 view .LVU148
+ 580              		.cfi_endproc
+ 581              	.LFE135:
+ 583              		.section	.text.GetPortValueFromCharacters,"ax",%progbits
+ 584              		.align	1
+ 585              		.global	GetPortValueFromCharacters
+ 586              		.syntax unified
+ 587              		.thumb
+ 588              		.thumb_func
+ 589              		.fpu fpv4-sp-d16
+ 591              	GetPortValueFromCharacters:
+ 592              	.LVL56:
+ 593              	.LFB136:
+ 212:Core/Src/PCF8551ATT_Driver.c ****     uint32_t portValue;
+ 594              		.loc 1 212 1 is_stmt 1 view -0
+ 595              		.cfi_startproc
+ 596              		@ args = 4, pretend = 0, frame = 0
+ 597              		@ frame_needed = 0, uses_anonymous_args = 0
+ 212:Core/Src/PCF8551ATT_Driver.c ****     uint32_t portValue;
+ 598              		.loc 1 212 1 is_stmt 0 view .LVU150
+ 599 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 600              	.LCFI12:
+ 601              		.cfi_def_cfa_offset 24
+ 602              		.cfi_offset 3, -24
+ 603              		.cfi_offset 4, -20
+ 604              		.cfi_offset 5, -16
+ 605              		.cfi_offset 6, -12
+ 606              		.cfi_offset 7, -8
+ 607              		.cfi_offset 14, -4
+ 608 0002 0F46     		mov	r7, r1
+ 609 0004 1646     		mov	r6, r2
+ 610 0006 1D46     		mov	r5, r3
+ 213:Core/Src/PCF8551ATT_Driver.c ****     portValue = GetSegmentValueFromCharacter(digit0, 0);
+ 611              		.loc 1 213 5 is_stmt 1 view .LVU151
+ 214:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit1, 0) << 8;
+ 612              		.loc 1 214 5 view .LVU152
+ 214:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit1, 0) << 8;
+ 613              		.loc 1 214 17 is_stmt 0 view .LVU153
+ARM GAS  /tmp/ccL8eWVw.s 			page 18
+
+
+ 614 0008 0021     		movs	r1, #0
+ 615              	.LVL57:
+ 214:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit1, 0) << 8;
+ 616              		.loc 1 214 17 view .LVU154
+ 617 000a FFF7FEFF 		bl	GetSegmentValueFromCharacter
+ 618              	.LVL58:
+ 214:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit1, 0) << 8;
+ 619              		.loc 1 214 17 view .LVU155
+ 620 000e 0446     		mov	r4, r0
+ 621              	.LVL59:
+ 215:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit2, 0) << 16;
+ 622              		.loc 1 215 5 is_stmt 1 view .LVU156
+ 215:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit2, 0) << 16;
+ 623              		.loc 1 215 18 is_stmt 0 view .LVU157
+ 624 0010 0021     		movs	r1, #0
+ 625 0012 3846     		mov	r0, r7
+ 626              	.LVL60:
+ 215:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit2, 0) << 16;
+ 627              		.loc 1 215 18 view .LVU158
+ 628 0014 FFF7FEFF 		bl	GetSegmentValueFromCharacter
+ 629              	.LVL61:
+ 215:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit2, 0) << 16;
+ 630              		.loc 1 215 15 view .LVU159
+ 631 0018 44EA0024 		orr	r4, r4, r0, lsl #8
+ 632              	.LVL62:
+ 216:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit3, 0) << 24;
+ 633              		.loc 1 216 5 is_stmt 1 view .LVU160
+ 216:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit3, 0) << 24;
+ 634              		.loc 1 216 18 is_stmt 0 view .LVU161
+ 635 001c 0021     		movs	r1, #0
+ 636 001e 3046     		mov	r0, r6
+ 637 0020 FFF7FEFF 		bl	GetSegmentValueFromCharacter
+ 638              	.LVL63:
+ 216:Core/Src/PCF8551ATT_Driver.c ****     portValue |= GetSegmentValueFromCharacter(digit3, 0) << 24;
+ 639              		.loc 1 216 15 view .LVU162
+ 640 0024 44EA0044 		orr	r4, r4, r0, lsl #16
+ 641              	.LVL64:
+ 217:Core/Src/PCF8551ATT_Driver.c ****     
+ 642              		.loc 1 217 5 is_stmt 1 view .LVU163
+ 217:Core/Src/PCF8551ATT_Driver.c ****     
+ 643              		.loc 1 217 18 is_stmt 0 view .LVU164
+ 644 0028 0021     		movs	r1, #0
+ 645 002a 2846     		mov	r0, r5
+ 646 002c FFF7FEFF 		bl	GetSegmentValueFromCharacter
+ 647              	.LVL65:
+ 219:Core/Src/PCF8551ATT_Driver.c **** }
+ 648              		.loc 1 219 5 is_stmt 1 view .LVU165
+ 220:Core/Src/PCF8551ATT_Driver.c **** 
+ 649              		.loc 1 220 1 is_stmt 0 view .LVU166
+ 650 0030 44EA0060 		orr	r0, r4, r0, lsl #24
+ 651              	.LVL66:
+ 220:Core/Src/PCF8551ATT_Driver.c **** 
+ 652              		.loc 1 220 1 view .LVU167
+ 653 0034 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 220:Core/Src/PCF8551ATT_Driver.c **** 
+ 654              		.loc 1 220 1 view .LVU168
+ 655              		.cfi_endproc
+ARM GAS  /tmp/ccL8eWVw.s 			page 19
+
+
+ 656              	.LFE136:
+ 658              		.section	.bss.DEVICE_ADDR,"aw",%nobits
+ 659              		.set	.LANCHOR0,. + 0
+ 662              	DEVICE_ADDR:
+ 663 0000 00       		.space	1
+ 664              		.text
+ 665              	.Letext0:
+ 666              		.file 2 "/usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h"
+ 667              		.file 3 "Drivers/CMSIS/Include/core_cm4.h"
+ 668              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
+ 669              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f302xc.h"
+ 670              		.file 6 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 671              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_smbus.h"
+ 672              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ 673              		.file 9 "Core/Inc/PCF8551ATT_Driver.h"
+ 674              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c.h"
+ARM GAS  /tmp/ccL8eWVw.s 			page 20
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 PCF8551ATT_Driver.c
+     /tmp/ccL8eWVw.s:18     .text.WriteRegister_PCF8551:0000000000000000 $t
+     /tmp/ccL8eWVw.s:25     .text.WriteRegister_PCF8551:0000000000000000 WriteRegister_PCF8551
+     /tmp/ccL8eWVw.s:100    .text.WriteMultipleRegister_PCF8551:0000000000000000 $t
+     /tmp/ccL8eWVw.s:106    .text.WriteMultipleRegister_PCF8551:0000000000000000 WriteMultipleRegister_PCF8551
+     /tmp/ccL8eWVw.s:179    .text.Init_PCF8551:0000000000000000 $t
+     /tmp/ccL8eWVw.s:186    .text.Init_PCF8551:0000000000000000 Init_PCF8551
+     /tmp/ccL8eWVw.s:308    .text.Init_PCF8551:0000000000000068 $d
+     /tmp/ccL8eWVw.s:313    .text.WriteSegment_PCF8551:0000000000000000 $t
+     /tmp/ccL8eWVw.s:320    .text.WriteSegment_PCF8551:0000000000000000 WriteSegment_PCF8551
+     /tmp/ccL8eWVw.s:357    .text.WriteSegment_PCF8551:0000000000000018 $d
+     /tmp/ccL8eWVw.s:362    .text.WritePort_PCF8551:0000000000000000 $t
+     /tmp/ccL8eWVw.s:369    .text.WritePort_PCF8551:0000000000000000 WritePort_PCF8551
+     /tmp/ccL8eWVw.s:436    .text.WritePort_PCF8551:0000000000000038 $d
+     /tmp/ccL8eWVw.s:441    .text.GetSegmentValueFromDigit:0000000000000000 $t
+     /tmp/ccL8eWVw.s:448    .text.GetSegmentValueFromDigit:0000000000000000 GetSegmentValueFromDigit
+     /tmp/ccL8eWVw.s:475    .text.GetSegmentValueFromCharacter:0000000000000000 $t
+     /tmp/ccL8eWVw.s:482    .text.GetSegmentValueFromCharacter:0000000000000000 GetSegmentValueFromCharacter
+     /tmp/ccL8eWVw.s:509    .text.GetPortValueFromDigits:0000000000000000 $t
+     /tmp/ccL8eWVw.s:516    .text.GetPortValueFromDigits:0000000000000000 GetPortValueFromDigits
+     /tmp/ccL8eWVw.s:584    .text.GetPortValueFromCharacters:0000000000000000 $t
+     /tmp/ccL8eWVw.s:591    .text.GetPortValueFromCharacters:0000000000000000 GetPortValueFromCharacters
+     /tmp/ccL8eWVw.s:662    .bss.DEVICE_ADDR:0000000000000000 DEVICE_ADDR
+     /tmp/ccL8eWVw.s:663    .bss.DEVICE_ADDR:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_I2C_IsDeviceReady
+HAL_I2C_Mem_Write

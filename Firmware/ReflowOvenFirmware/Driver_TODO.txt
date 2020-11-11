@@ -1,0 +1,5 @@
+[X] TCA9534
+[ ] SDCard
+[ ] PCF533
+[ ] MCP96
+[X] INA226

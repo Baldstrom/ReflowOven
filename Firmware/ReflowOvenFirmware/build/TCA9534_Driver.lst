@@ -1,0 +1,474 @@
+ARM GAS  /tmp/cc2ldGvO.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"TCA9534_Driver.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.WriteRegister_TCA9534,"ax",%progbits
+  18              		.align	1
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	WriteRegister_TCA9534:
+  26              	.LVL0:
+  27              	.LFB133:
+  28              		.file 1 "Core/Src/TCA9534_Driver.c"
+   1:Core/Src/TCA9534_Driver.c **** #include "TCA9534_Driver.h"
+   2:Core/Src/TCA9534_Driver.c **** 
+   3:Core/Src/TCA9534_Driver.c **** static uint8_t DEVICE_ADDR;
+   4:Core/Src/TCA9534_Driver.c **** static uint8_t WriteRegister_TCA9534(uint8_t addr, uint8_t reg, uint8_t value, SMBUS_HandleTypeDef 
+   5:Core/Src/TCA9534_Driver.c **** static uint8_t ReadRegister_TCA9534(uint8_t addr, uint8_t reg, uint8_t *output, SMBUS_HandleTypeDef
+   6:Core/Src/TCA9534_Driver.c **** 
+   7:Core/Src/TCA9534_Driver.c **** uint8_t Init_TCA9534(TCA9534_Config *configuration, SMBUS_HandleTypeDef *I2C) 
+   8:Core/Src/TCA9534_Driver.c **** {
+   9:Core/Src/TCA9534_Driver.c ****     DEVICE_ADDR = configuration->DEV_ADDR << 1;
+  10:Core/Src/TCA9534_Driver.c ****     uint8_t SUCCESS = TCA9534_SUCCESS;
+  11:Core/Src/TCA9534_Driver.c ****     SUCCESS &= WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_DIR_CONFIG_REG, configuration->IO_CONFIG,
+  12:Core/Src/TCA9534_Driver.c ****     SUCCESS &= WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_POL_INV_REG, configuration->INVERSION_CON
+  13:Core/Src/TCA9534_Driver.c ****     return SUCCESS;
+  14:Core/Src/TCA9534_Driver.c **** }
+  15:Core/Src/TCA9534_Driver.c **** 
+  16:Core/Src/TCA9534_Driver.c **** uint8_t ReadGPIO_TCA9534(uint8_t *output, SMBUS_HandleTypeDef *I2C) 
+  17:Core/Src/TCA9534_Driver.c **** {
+  18:Core/Src/TCA9534_Driver.c ****     return ReadRegister_TCA9534(DEVICE_ADDR, TCA9534_INPUT_PORT_REG, output, I2C);
+  19:Core/Src/TCA9534_Driver.c **** }
+  20:Core/Src/TCA9534_Driver.c **** 
+  21:Core/Src/TCA9534_Driver.c **** uint8_t WriteGPIO_TCA9534(uint8_t byte, SMBUS_HandleTypeDef *I2C)
+  22:Core/Src/TCA9534_Driver.c **** {
+  23:Core/Src/TCA9534_Driver.c ****     return WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_OUTPUT_PORT_REG, byte, I2C);
+  24:Core/Src/TCA9534_Driver.c **** }
+  25:Core/Src/TCA9534_Driver.c **** 
+  26:Core/Src/TCA9534_Driver.c **** uint8_t WriteRegister_TCA9534(uint8_t addr, uint8_t reg, uint8_t value, SMBUS_HandleTypeDef *I2C) 
+  27:Core/Src/TCA9534_Driver.c **** {
+  29              		.loc 1 27 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+ARM GAS  /tmp/cc2ldGvO.s 			page 2
+
+
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 27 1 is_stmt 0 view .LVU1
+  34 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 20
+  37              		.cfi_offset 4, -20
+  38              		.cfi_offset 5, -16
+  39              		.cfi_offset 6, -12
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42 0002 87B0     		sub	sp, sp, #28
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_offset 48
+  45 0004 0646     		mov	r6, r0
+  46 0006 0F46     		mov	r7, r1
+  47 0008 1D46     		mov	r5, r3
+  28:Core/Src/TCA9534_Driver.c ****     uint8_t buffer[1];
+  48              		.loc 1 28 5 is_stmt 1 view .LVU2
+  29:Core/Src/TCA9534_Driver.c ****     buffer[0] = value;
+  49              		.loc 1 29 5 view .LVU3
+  50              		.loc 1 29 15 is_stmt 0 view .LVU4
+  51 000a 8DF81420 		strb	r2, [sp, #20]
+  30:Core/Src/TCA9534_Driver.c ****     HAL_StatusTypeDef status = HAL_OK;
+  52              		.loc 1 30 5 is_stmt 1 view .LVU5
+  53              	.LVL1:
+  31:Core/Src/TCA9534_Driver.c ****     while (HAL_I2C_IsDeviceReady(I2C, addr, TCA9534_READY_TRIALS, TCA9534_Timeout) != HAL_OK);
+  54              		.loc 1 31 5 view .LVU6
+  55              	.L2:
+  56              		.loc 1 31 94 discriminator 1 view .LVU7
+  57              		.loc 1 31 11 discriminator 1 view .LVU8
+  58              		.loc 1 31 12 is_stmt 0 discriminator 1 view .LVU9
+  59 000e B4B2     		uxth	r4, r6
+  60 0010 4FF47A73 		mov	r3, #1000
+  61 0014 8022     		movs	r2, #128
+  62 0016 2146     		mov	r1, r4
+  63 0018 2846     		mov	r0, r5
+  64 001a FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+  65              	.LVL2:
+  66              		.loc 1 31 11 discriminator 1 view .LVU10
+  67 001e 0028     		cmp	r0, #0
+  68 0020 F5D1     		bne	.L2
+  32:Core/Src/TCA9534_Driver.c ****     
+  33:Core/Src/TCA9534_Driver.c ****     status = HAL_I2C_Mem_Write(I2C, addr, reg, I2C_MEMADD_SIZE_8BIT, buffer, 1, TCA9534_Timeout);
+  69              		.loc 1 33 5 is_stmt 1 view .LVU11
+  70              		.loc 1 33 14 is_stmt 0 view .LVU12
+  71 0022 4FF47A73 		mov	r3, #1000
+  72 0026 0293     		str	r3, [sp, #8]
+  73 0028 0123     		movs	r3, #1
+  74 002a 0193     		str	r3, [sp, #4]
+  75 002c 05AA     		add	r2, sp, #20
+  76 002e 0092     		str	r2, [sp]
+  77 0030 3A46     		mov	r2, r7
+  78 0032 2146     		mov	r1, r4
+  79 0034 2846     		mov	r0, r5
+  80 0036 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+  81              	.LVL3:
+  34:Core/Src/TCA9534_Driver.c ****     
+ARM GAS  /tmp/cc2ldGvO.s 			page 3
+
+
+  35:Core/Src/TCA9534_Driver.c ****     if (status == HAL_OK)
+  82              		.loc 1 35 5 is_stmt 1 view .LVU13
+  83              		.loc 1 35 8 is_stmt 0 view .LVU14
+  84 003a 00B1     		cbz	r0, .L3
+  36:Core/Src/TCA9534_Driver.c ****     {
+  37:Core/Src/TCA9534_Driver.c ****         return TCA9534_SUCCESS;
+  38:Core/Src/TCA9534_Driver.c ****     }
+  39:Core/Src/TCA9534_Driver.c ****     return TCA9534_FAILURE;
+  85              		.loc 1 39 12 view .LVU15
+  86 003c 0120     		movs	r0, #1
+  87              	.LVL4:
+  88              	.L3:
+  40:Core/Src/TCA9534_Driver.c **** }
+  89              		.loc 1 40 1 view .LVU16
+  90 003e 07B0     		add	sp, sp, #28
+  91              	.LCFI2:
+  92              		.cfi_def_cfa_offset 20
+  93              		@ sp needed
+  94 0040 F0BD     		pop	{r4, r5, r6, r7, pc}
+  95              		.loc 1 40 1 view .LVU17
+  96              		.cfi_endproc
+  97              	.LFE133:
+  99              		.section	.text.ReadRegister_TCA9534,"ax",%progbits
+ 100              		.align	1
+ 101              		.syntax unified
+ 102              		.thumb
+ 103              		.thumb_func
+ 104              		.fpu fpv4-sp-d16
+ 106              	ReadRegister_TCA9534:
+ 107              	.LVL5:
+ 108              	.LFB134:
+  41:Core/Src/TCA9534_Driver.c **** 
+  42:Core/Src/TCA9534_Driver.c **** uint8_t ReadRegister_TCA9534(uint8_t addr, uint8_t reg, uint8_t *output, SMBUS_HandleTypeDef *I2C) 
+  43:Core/Src/TCA9534_Driver.c **** {
+ 109              		.loc 1 43 1 is_stmt 1 view -0
+ 110              		.cfi_startproc
+ 111              		@ args = 0, pretend = 0, frame = 8
+ 112              		@ frame_needed = 0, uses_anonymous_args = 0
+ 113              		.loc 1 43 1 is_stmt 0 view .LVU19
+ 114 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 115              	.LCFI3:
+ 116              		.cfi_def_cfa_offset 24
+ 117              		.cfi_offset 4, -24
+ 118              		.cfi_offset 5, -20
+ 119              		.cfi_offset 6, -16
+ 120              		.cfi_offset 7, -12
+ 121              		.cfi_offset 8, -8
+ 122              		.cfi_offset 14, -4
+ 123 0004 86B0     		sub	sp, sp, #24
+ 124              	.LCFI4:
+ 125              		.cfi_def_cfa_offset 48
+ 126 0006 0646     		mov	r6, r0
+ 127 0008 8846     		mov	r8, r1
+ 128 000a 1746     		mov	r7, r2
+ 129 000c 1D46     		mov	r5, r3
+  44:Core/Src/TCA9534_Driver.c ****     uint8_t buffer[1];
+ 130              		.loc 1 44 5 is_stmt 1 view .LVU20
+ARM GAS  /tmp/cc2ldGvO.s 			page 4
+
+
+  45:Core/Src/TCA9534_Driver.c ****     HAL_StatusTypeDef status = HAL_OK;
+ 131              		.loc 1 45 5 view .LVU21
+ 132              	.LVL6:
+  46:Core/Src/TCA9534_Driver.c ****     while (HAL_I2C_IsDeviceReady(I2C, addr, TCA9534_READY_TRIALS, TCA9534_Timeout) != HAL_OK);
+ 133              		.loc 1 46 5 view .LVU22
+ 134              	.L6:
+ 135              		.loc 1 46 94 discriminator 1 view .LVU23
+ 136              		.loc 1 46 11 discriminator 1 view .LVU24
+ 137              		.loc 1 46 12 is_stmt 0 discriminator 1 view .LVU25
+ 138 000e B4B2     		uxth	r4, r6
+ 139 0010 4FF47A73 		mov	r3, #1000
+ 140 0014 8022     		movs	r2, #128
+ 141 0016 2146     		mov	r1, r4
+ 142 0018 2846     		mov	r0, r5
+ 143 001a FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+ 144              	.LVL7:
+ 145              		.loc 1 46 11 discriminator 1 view .LVU26
+ 146 001e 0028     		cmp	r0, #0
+ 147 0020 F5D1     		bne	.L6
+  47:Core/Src/TCA9534_Driver.c ****     
+  48:Core/Src/TCA9534_Driver.c ****     status = HAL_I2C_Mem_Read(I2C, addr, reg, I2C_MEMADD_SIZE_8BIT, buffer, 1, TCA9534_Timeout);
+ 148              		.loc 1 48 5 is_stmt 1 view .LVU27
+ 149              		.loc 1 48 14 is_stmt 0 view .LVU28
+ 150 0022 4FF47A73 		mov	r3, #1000
+ 151 0026 0293     		str	r3, [sp, #8]
+ 152 0028 0123     		movs	r3, #1
+ 153 002a 0193     		str	r3, [sp, #4]
+ 154 002c 05AA     		add	r2, sp, #20
+ 155 002e 0092     		str	r2, [sp]
+ 156 0030 4246     		mov	r2, r8
+ 157 0032 2146     		mov	r1, r4
+ 158 0034 2846     		mov	r0, r5
+ 159 0036 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 160              	.LVL8:
+  49:Core/Src/TCA9534_Driver.c ****     *output = buffer[0];
+ 161              		.loc 1 49 5 is_stmt 1 view .LVU29
+ 162              		.loc 1 49 21 is_stmt 0 view .LVU30
+ 163 003a 9DF81420 		ldrb	r2, [sp, #20]	@ zero_extendqisi2
+ 164              		.loc 1 49 13 view .LVU31
+ 165 003e 3A70     		strb	r2, [r7]
+  50:Core/Src/TCA9534_Driver.c **** 
+  51:Core/Src/TCA9534_Driver.c ****     if (status == HAL_OK)
+ 166              		.loc 1 51 5 is_stmt 1 view .LVU32
+ 167              		.loc 1 51 8 is_stmt 0 view .LVU33
+ 168 0040 00B1     		cbz	r0, .L7
+  52:Core/Src/TCA9534_Driver.c ****     {
+  53:Core/Src/TCA9534_Driver.c ****         return TCA9534_SUCCESS;
+  54:Core/Src/TCA9534_Driver.c ****     }
+  55:Core/Src/TCA9534_Driver.c ****     return TCA9534_FAILURE;
+ 169              		.loc 1 55 12 view .LVU34
+ 170 0042 0120     		movs	r0, #1
+ 171              	.LVL9:
+ 172              	.L7:
+  56:Core/Src/TCA9534_Driver.c **** }
+ 173              		.loc 1 56 1 view .LVU35
+ 174 0044 06B0     		add	sp, sp, #24
+ 175              	.LCFI5:
+ARM GAS  /tmp/cc2ldGvO.s 			page 5
+
+
+ 176              		.cfi_def_cfa_offset 24
+ 177              		@ sp needed
+ 178 0046 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 179              		.loc 1 56 1 view .LVU36
+ 180              		.cfi_endproc
+ 181              	.LFE134:
+ 183              		.section	.text.Init_TCA9534,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	Init_TCA9534
+ 186              		.syntax unified
+ 187              		.thumb
+ 188              		.thumb_func
+ 189              		.fpu fpv4-sp-d16
+ 191              	Init_TCA9534:
+ 192              	.LVL10:
+ 193              	.LFB130:
+   8:Core/Src/TCA9534_Driver.c ****     DEVICE_ADDR = configuration->DEV_ADDR << 1;
+ 194              		.loc 1 8 1 is_stmt 1 view -0
+ 195              		.cfi_startproc
+ 196              		@ args = 0, pretend = 0, frame = 0
+ 197              		@ frame_needed = 0, uses_anonymous_args = 0
+   8:Core/Src/TCA9534_Driver.c ****     DEVICE_ADDR = configuration->DEV_ADDR << 1;
+ 198              		.loc 1 8 1 is_stmt 0 view .LVU38
+ 199 0000 70B5     		push	{r4, r5, r6, lr}
+ 200              	.LCFI6:
+ 201              		.cfi_def_cfa_offset 16
+ 202              		.cfi_offset 4, -16
+ 203              		.cfi_offset 5, -12
+ 204              		.cfi_offset 6, -8
+ 205              		.cfi_offset 14, -4
+ 206 0002 0446     		mov	r4, r0
+ 207 0004 0D46     		mov	r5, r1
+   9:Core/Src/TCA9534_Driver.c ****     uint8_t SUCCESS = TCA9534_SUCCESS;
+ 208              		.loc 1 9 5 is_stmt 1 view .LVU39
+   9:Core/Src/TCA9534_Driver.c ****     uint8_t SUCCESS = TCA9534_SUCCESS;
+ 209              		.loc 1 9 32 is_stmt 0 view .LVU40
+ 210 0006 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+   9:Core/Src/TCA9534_Driver.c ****     uint8_t SUCCESS = TCA9534_SUCCESS;
+ 211              		.loc 1 9 43 view .LVU41
+ 212 0008 5B00     		lsls	r3, r3, #1
+ 213 000a D8B2     		uxtb	r0, r3
+ 214              	.LVL11:
+   9:Core/Src/TCA9534_Driver.c ****     uint8_t SUCCESS = TCA9534_SUCCESS;
+ 215              		.loc 1 9 17 view .LVU42
+ 216 000c 074E     		ldr	r6, .L11
+ 217 000e 3070     		strb	r0, [r6]
+  10:Core/Src/TCA9534_Driver.c ****     SUCCESS &= WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_DIR_CONFIG_REG, configuration->IO_CONFIG,
+ 218              		.loc 1 10 5 is_stmt 1 view .LVU43
+ 219              	.LVL12:
+  11:Core/Src/TCA9534_Driver.c ****     SUCCESS &= WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_POL_INV_REG, configuration->INVERSION_CON
+ 220              		.loc 1 11 5 view .LVU44
+  11:Core/Src/TCA9534_Driver.c ****     SUCCESS &= WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_POL_INV_REG, configuration->INVERSION_CON
+ 221              		.loc 1 11 16 is_stmt 0 view .LVU45
+ 222 0010 0B46     		mov	r3, r1
+ 223 0012 6278     		ldrb	r2, [r4, #1]	@ zero_extendqisi2
+ 224 0014 0321     		movs	r1, #3
+ 225              	.LVL13:
+ARM GAS  /tmp/cc2ldGvO.s 			page 6
+
+
+  11:Core/Src/TCA9534_Driver.c ****     SUCCESS &= WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_POL_INV_REG, configuration->INVERSION_CON
+ 226              		.loc 1 11 16 view .LVU46
+ 227 0016 FFF7FEFF 		bl	WriteRegister_TCA9534
+ 228              	.LVL14:
+  12:Core/Src/TCA9534_Driver.c ****     return SUCCESS;
+ 229              		.loc 1 12 5 is_stmt 1 view .LVU47
+  12:Core/Src/TCA9534_Driver.c ****     return SUCCESS;
+ 230              		.loc 1 12 16 is_stmt 0 view .LVU48
+ 231 001a 2B46     		mov	r3, r5
+ 232 001c A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+ 233 001e 0221     		movs	r1, #2
+ 234 0020 3078     		ldrb	r0, [r6]	@ zero_extendqisi2
+ 235 0022 FFF7FEFF 		bl	WriteRegister_TCA9534
+ 236              	.LVL15:
+  13:Core/Src/TCA9534_Driver.c **** }
+ 237              		.loc 1 13 5 is_stmt 1 view .LVU49
+  14:Core/Src/TCA9534_Driver.c **** 
+ 238              		.loc 1 14 1 is_stmt 0 view .LVU50
+ 239 0026 0020     		movs	r0, #0
+ 240 0028 70BD     		pop	{r4, r5, r6, pc}
+ 241              	.LVL16:
+ 242              	.L12:
+  14:Core/Src/TCA9534_Driver.c **** 
+ 243              		.loc 1 14 1 view .LVU51
+ 244 002a 00BF     		.align	2
+ 245              	.L11:
+ 246 002c 00000000 		.word	.LANCHOR0
+ 247              		.cfi_endproc
+ 248              	.LFE130:
+ 250              		.section	.text.ReadGPIO_TCA9534,"ax",%progbits
+ 251              		.align	1
+ 252              		.global	ReadGPIO_TCA9534
+ 253              		.syntax unified
+ 254              		.thumb
+ 255              		.thumb_func
+ 256              		.fpu fpv4-sp-d16
+ 258              	ReadGPIO_TCA9534:
+ 259              	.LVL17:
+ 260              	.LFB131:
+  17:Core/Src/TCA9534_Driver.c ****     return ReadRegister_TCA9534(DEVICE_ADDR, TCA9534_INPUT_PORT_REG, output, I2C);
+ 261              		.loc 1 17 1 is_stmt 1 view -0
+ 262              		.cfi_startproc
+ 263              		@ args = 0, pretend = 0, frame = 0
+ 264              		@ frame_needed = 0, uses_anonymous_args = 0
+  17:Core/Src/TCA9534_Driver.c ****     return ReadRegister_TCA9534(DEVICE_ADDR, TCA9534_INPUT_PORT_REG, output, I2C);
+ 265              		.loc 1 17 1 is_stmt 0 view .LVU53
+ 266 0000 08B5     		push	{r3, lr}
+ 267              	.LCFI7:
+ 268              		.cfi_def_cfa_offset 8
+ 269              		.cfi_offset 3, -8
+ 270              		.cfi_offset 14, -4
+ 271 0002 0246     		mov	r2, r0
+ 272 0004 0B46     		mov	r3, r1
+  18:Core/Src/TCA9534_Driver.c **** }
+ 273              		.loc 1 18 5 is_stmt 1 view .LVU54
+  18:Core/Src/TCA9534_Driver.c **** }
+ 274              		.loc 1 18 12 is_stmt 0 view .LVU55
+ARM GAS  /tmp/cc2ldGvO.s 			page 7
+
+
+ 275 0006 0021     		movs	r1, #0
+ 276              	.LVL18:
+  18:Core/Src/TCA9534_Driver.c **** }
+ 277              		.loc 1 18 12 view .LVU56
+ 278 0008 0248     		ldr	r0, .L15
+ 279              	.LVL19:
+  18:Core/Src/TCA9534_Driver.c **** }
+ 280              		.loc 1 18 12 view .LVU57
+ 281 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 282 000c FFF7FEFF 		bl	ReadRegister_TCA9534
+ 283              	.LVL20:
+  19:Core/Src/TCA9534_Driver.c **** 
+ 284              		.loc 1 19 1 view .LVU58
+ 285 0010 08BD     		pop	{r3, pc}
+ 286              	.L16:
+ 287 0012 00BF     		.align	2
+ 288              	.L15:
+ 289 0014 00000000 		.word	.LANCHOR0
+ 290              		.cfi_endproc
+ 291              	.LFE131:
+ 293              		.section	.text.WriteGPIO_TCA9534,"ax",%progbits
+ 294              		.align	1
+ 295              		.global	WriteGPIO_TCA9534
+ 296              		.syntax unified
+ 297              		.thumb
+ 298              		.thumb_func
+ 299              		.fpu fpv4-sp-d16
+ 301              	WriteGPIO_TCA9534:
+ 302              	.LVL21:
+ 303              	.LFB132:
+  22:Core/Src/TCA9534_Driver.c ****     return WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_OUTPUT_PORT_REG, byte, I2C);
+ 304              		.loc 1 22 1 is_stmt 1 view -0
+ 305              		.cfi_startproc
+ 306              		@ args = 0, pretend = 0, frame = 0
+ 307              		@ frame_needed = 0, uses_anonymous_args = 0
+  22:Core/Src/TCA9534_Driver.c ****     return WriteRegister_TCA9534(DEVICE_ADDR, TCA9534_OUTPUT_PORT_REG, byte, I2C);
+ 308              		.loc 1 22 1 is_stmt 0 view .LVU60
+ 309 0000 08B5     		push	{r3, lr}
+ 310              	.LCFI8:
+ 311              		.cfi_def_cfa_offset 8
+ 312              		.cfi_offset 3, -8
+ 313              		.cfi_offset 14, -4
+ 314 0002 0246     		mov	r2, r0
+ 315 0004 0B46     		mov	r3, r1
+  23:Core/Src/TCA9534_Driver.c **** }
+ 316              		.loc 1 23 5 is_stmt 1 view .LVU61
+  23:Core/Src/TCA9534_Driver.c **** }
+ 317              		.loc 1 23 12 is_stmt 0 view .LVU62
+ 318 0006 0121     		movs	r1, #1
+ 319              	.LVL22:
+  23:Core/Src/TCA9534_Driver.c **** }
+ 320              		.loc 1 23 12 view .LVU63
+ 321 0008 0248     		ldr	r0, .L19
+ 322              	.LVL23:
+  23:Core/Src/TCA9534_Driver.c **** }
+ 323              		.loc 1 23 12 view .LVU64
+ 324 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ARM GAS  /tmp/cc2ldGvO.s 			page 8
+
+
+ 325 000c FFF7FEFF 		bl	WriteRegister_TCA9534
+ 326              	.LVL24:
+  24:Core/Src/TCA9534_Driver.c **** 
+ 327              		.loc 1 24 1 view .LVU65
+ 328 0010 08BD     		pop	{r3, pc}
+ 329              	.L20:
+ 330 0012 00BF     		.align	2
+ 331              	.L19:
+ 332 0014 00000000 		.word	.LANCHOR0
+ 333              		.cfi_endproc
+ 334              	.LFE132:
+ 336              		.section	.bss.DEVICE_ADDR,"aw",%nobits
+ 337              		.set	.LANCHOR0,. + 0
+ 340              	DEVICE_ADDR:
+ 341 0000 00       		.space	1
+ 342              		.text
+ 343              	.Letext0:
+ 344              		.file 2 "/usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h"
+ 345              		.file 3 "Drivers/CMSIS/Include/core_cm4.h"
+ 346              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
+ 347              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f302xc.h"
+ 348              		.file 6 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 349              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_smbus.h"
+ 350              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ 351              		.file 9 "Core/Inc/TCA9534_Driver.h"
+ 352              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c.h"
+ARM GAS  /tmp/cc2ldGvO.s 			page 9
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 TCA9534_Driver.c
+     /tmp/cc2ldGvO.s:18     .text.WriteRegister_TCA9534:0000000000000000 $t
+     /tmp/cc2ldGvO.s:25     .text.WriteRegister_TCA9534:0000000000000000 WriteRegister_TCA9534
+     /tmp/cc2ldGvO.s:100    .text.ReadRegister_TCA9534:0000000000000000 $t
+     /tmp/cc2ldGvO.s:106    .text.ReadRegister_TCA9534:0000000000000000 ReadRegister_TCA9534
+     /tmp/cc2ldGvO.s:184    .text.Init_TCA9534:0000000000000000 $t
+     /tmp/cc2ldGvO.s:191    .text.Init_TCA9534:0000000000000000 Init_TCA9534
+     /tmp/cc2ldGvO.s:246    .text.Init_TCA9534:000000000000002c $d
+     /tmp/cc2ldGvO.s:251    .text.ReadGPIO_TCA9534:0000000000000000 $t
+     /tmp/cc2ldGvO.s:258    .text.ReadGPIO_TCA9534:0000000000000000 ReadGPIO_TCA9534
+     /tmp/cc2ldGvO.s:289    .text.ReadGPIO_TCA9534:0000000000000014 $d
+     /tmp/cc2ldGvO.s:294    .text.WriteGPIO_TCA9534:0000000000000000 $t
+     /tmp/cc2ldGvO.s:301    .text.WriteGPIO_TCA9534:0000000000000000 WriteGPIO_TCA9534
+     /tmp/cc2ldGvO.s:332    .text.WriteGPIO_TCA9534:0000000000000014 $d
+     /tmp/cc2ldGvO.s:340    .bss.DEVICE_ADDR:0000000000000000 DEVICE_ADDR
+     /tmp/cc2ldGvO.s:341    .bss.DEVICE_ADDR:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_I2C_IsDeviceReady
+HAL_I2C_Mem_Write
+HAL_I2C_Mem_Read

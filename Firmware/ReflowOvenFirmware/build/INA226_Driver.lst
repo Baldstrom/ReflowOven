@@ -1,0 +1,784 @@
+ARM GAS  /tmp/ccWzSuFb.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"INA226_Driver.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.WriteRegister_INA226,"ax",%progbits
+  18              		.align	1
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	WriteRegister_INA226:
+  26              	.LVL0:
+  27              	.LFB137:
+  28              		.file 1 "Core/Src/INA226_Driver.c"
+   1:Core/Src/INA226_Driver.c **** #include "INA226_Driver.h"
+   2:Core/Src/INA226_Driver.c **** 
+   3:Core/Src/INA226_Driver.c **** static uint8_t DEVICE_ADDR;
+   4:Core/Src/INA226_Driver.c **** static uint8_t WriteRegister_INA226(uint8_t addr, uint8_t reg, uint16_t value, SMBUS_HandleTypeDef 
+   5:Core/Src/INA226_Driver.c **** static uint8_t ReadRegister_INA226(uint8_t addr, uint8_t reg, uint8_t *output, SMBUS_HandleTypeDef 
+   6:Core/Src/INA226_Driver.c **** 
+   7:Core/Src/INA226_Driver.c **** uint8_t Init_INA226(INA226_Config *configuration, SMBUS_HandleTypeDef *I2C) 
+   8:Core/Src/INA226_Driver.c **** {
+   9:Core/Src/INA226_Driver.c ****     DEVICE_ADDR = configuration->DEVICE_ADDR;
+  10:Core/Src/INA226_Driver.c ****     uint16_t configReg = 0x4000;
+  11:Core/Src/INA226_Driver.c ****     configReg |= configuration->OP_MODE;
+  12:Core/Src/INA226_Driver.c ****     configReg |= (configuration->SHNT_VOLT_CONV_TIME << 3);    
+  13:Core/Src/INA226_Driver.c ****     configReg |= (configuration->VBUS_CONV_TIME << 6);
+  14:Core/Src/INA226_Driver.c ****     configReg |= (configuration->AVG_CONFIG << 9);
+  15:Core/Src/INA226_Driver.c ****     uint8_t status = INA226_SUCCESS;
+  16:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, configReg, I2C);
+  17:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, configuration->CALIBRATION_VALUE, I
+  18:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_ALERT_LIM_REG, configuration->ALERT_LIM, I2C
+  19:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_MASK_EN_REG, configuration->MASK_ENABLE_CONF
+  20:Core/Src/INA226_Driver.c ****     return status;
+  21:Core/Src/INA226_Driver.c **** }
+  22:Core/Src/INA226_Driver.c **** 
+  23:Core/Src/INA226_Driver.c **** uint8_t Reset_INA226(SMBUS_HandleTypeDef *I2C) 
+  24:Core/Src/INA226_Driver.c **** {
+  25:Core/Src/INA226_Driver.c ****     return WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, 0x8000, I2C);
+  26:Core/Src/INA226_Driver.c **** }
+  27:Core/Src/INA226_Driver.c **** 
+  28:Core/Src/INA226_Driver.c **** uint8_t ReadShuntVoltage_INA226(SMBUS_HandleTypeDef *I2C, uint16_t *output) 
+  29:Core/Src/INA226_Driver.c **** {
+  30:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_SHUNT_VOLTAGE_REG, output, I2C);
+ARM GAS  /tmp/ccWzSuFb.s 			page 2
+
+
+  31:Core/Src/INA226_Driver.c **** }
+  32:Core/Src/INA226_Driver.c **** 
+  33:Core/Src/INA226_Driver.c **** uint8_t ReadBusVoltage_INA226(SMBUS_HandleTypeDef *I2C, uint16_t *output) 
+  34:Core/Src/INA226_Driver.c **** {
+  35:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_BUS_VOLTAGE_REG, output, I2C);
+  36:Core/Src/INA226_Driver.c **** }
+  37:Core/Src/INA226_Driver.c **** 
+  38:Core/Src/INA226_Driver.c **** uint8_t ReadBusPower_INA226(SMBUS_HandleTypeDef *I2C, uint16_t *output) 
+  39:Core/Src/INA226_Driver.c **** {
+  40:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_PWR_REG, output, I2C);
+  41:Core/Src/INA226_Driver.c **** }
+  42:Core/Src/INA226_Driver.c **** 
+  43:Core/Src/INA226_Driver.c **** uint8_t ReadBusCurrent_INA226(SMBUS_HandleTypeDef *I2C, uint16_t *output) 
+  44:Core/Src/INA226_Driver.c **** {
+  45:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CURRENT_REG, output, I2C);
+  46:Core/Src/INA226_Driver.c **** }
+  47:Core/Src/INA226_Driver.c **** 
+  48:Core/Src/INA226_Driver.c **** uint8_t ReadCalibrationRegister_INA226(SMBUS_HandleTypeDef *I2C, uint16_t *output) 
+  49:Core/Src/INA226_Driver.c **** {
+  50:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, output, I2C);
+  51:Core/Src/INA226_Driver.c **** }
+  52:Core/Src/INA226_Driver.c **** 
+  53:Core/Src/INA226_Driver.c **** uint8_t WriteRegister_INA226(uint8_t addr, uint8_t reg, uint16_t value, SMBUS_HandleTypeDef *I2C) 
+  54:Core/Src/INA226_Driver.c **** {
+  29              		.loc 1 54 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 54 1 is_stmt 0 view .LVU1
+  34 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 20
+  37              		.cfi_offset 4, -20
+  38              		.cfi_offset 5, -16
+  39              		.cfi_offset 6, -12
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42 0002 87B0     		sub	sp, sp, #28
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_offset 48
+  45 0004 0646     		mov	r6, r0
+  46 0006 0F46     		mov	r7, r1
+  47 0008 1D46     		mov	r5, r3
+  55:Core/Src/INA226_Driver.c ****     uint8_t buffer[2];
+  48              		.loc 1 55 5 is_stmt 1 view .LVU2
+  56:Core/Src/INA226_Driver.c ****     buffer[0] = value;
+  49              		.loc 1 56 5 view .LVU3
+  50              		.loc 1 56 15 is_stmt 0 view .LVU4
+  51 000a 8DF81420 		strb	r2, [sp, #20]
+  57:Core/Src/INA226_Driver.c ****     buffer[1] = value >> 8;
+  52              		.loc 1 57 5 is_stmt 1 view .LVU5
+  53              		.loc 1 57 15 is_stmt 0 view .LVU6
+  54 000e 120A     		lsrs	r2, r2, #8
+  55              	.LVL1:
+  56              		.loc 1 57 15 view .LVU7
+  57 0010 8DF81520 		strb	r2, [sp, #21]
+  58:Core/Src/INA226_Driver.c **** 
+ARM GAS  /tmp/ccWzSuFb.s 			page 3
+
+
+  59:Core/Src/INA226_Driver.c ****     HAL_StatusTypeDef status = HAL_OK;
+  58              		.loc 1 59 5 is_stmt 1 view .LVU8
+  59              	.LVL2:
+  60:Core/Src/INA226_Driver.c ****     while (HAL_I2C_IsDeviceReady(I2C, addr, INA226_READY_TRIALS, INA226_Timeout) != HAL_OK);
+  60              		.loc 1 60 5 view .LVU9
+  61              	.L2:
+  62              		.loc 1 60 92 discriminator 1 view .LVU10
+  63              		.loc 1 60 11 discriminator 1 view .LVU11
+  64              		.loc 1 60 12 is_stmt 0 discriminator 1 view .LVU12
+  65 0014 B4B2     		uxth	r4, r6
+  66 0016 4FF47A73 		mov	r3, #1000
+  67 001a 6422     		movs	r2, #100
+  68 001c 2146     		mov	r1, r4
+  69 001e 2846     		mov	r0, r5
+  70 0020 FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+  71              	.LVL3:
+  72              		.loc 1 60 11 discriminator 1 view .LVU13
+  73 0024 0028     		cmp	r0, #0
+  74 0026 F5D1     		bne	.L2
+  61:Core/Src/INA226_Driver.c ****     
+  62:Core/Src/INA226_Driver.c ****     status = HAL_I2C_Mem_Write(I2C, addr, reg, I2C_MEMADD_SIZE_8BIT, buffer, 2, INA226_Timeout);
+  75              		.loc 1 62 5 is_stmt 1 view .LVU14
+  76              		.loc 1 62 14 is_stmt 0 view .LVU15
+  77 0028 4FF47A73 		mov	r3, #1000
+  78 002c 0293     		str	r3, [sp, #8]
+  79 002e 0223     		movs	r3, #2
+  80 0030 0193     		str	r3, [sp, #4]
+  81 0032 05AB     		add	r3, sp, #20
+  82 0034 0093     		str	r3, [sp]
+  83 0036 0123     		movs	r3, #1
+  84 0038 3A46     		mov	r2, r7
+  85 003a 2146     		mov	r1, r4
+  86 003c 2846     		mov	r0, r5
+  87 003e FFF7FEFF 		bl	HAL_I2C_Mem_Write
+  88              	.LVL4:
+  63:Core/Src/INA226_Driver.c ****     
+  64:Core/Src/INA226_Driver.c ****     if (status == HAL_OK)
+  89              		.loc 1 64 5 is_stmt 1 view .LVU16
+  90              		.loc 1 64 8 is_stmt 0 view .LVU17
+  91 0042 00B1     		cbz	r0, .L3
+  65:Core/Src/INA226_Driver.c ****     {
+  66:Core/Src/INA226_Driver.c ****         return INA226_SUCCESS;
+  67:Core/Src/INA226_Driver.c ****     }
+  68:Core/Src/INA226_Driver.c ****     return INA226_FAILURE;
+  92              		.loc 1 68 12 view .LVU18
+  93 0044 0120     		movs	r0, #1
+  94              	.LVL5:
+  95              	.L3:
+  69:Core/Src/INA226_Driver.c **** }
+  96              		.loc 1 69 1 view .LVU19
+  97 0046 07B0     		add	sp, sp, #28
+  98              	.LCFI2:
+  99              		.cfi_def_cfa_offset 20
+ 100              		@ sp needed
+ 101 0048 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 102              		.loc 1 69 1 view .LVU20
+ 103              		.cfi_endproc
+ARM GAS  /tmp/ccWzSuFb.s 			page 4
+
+
+ 104              	.LFE137:
+ 106              		.section	.text.ReadRegister_INA226,"ax",%progbits
+ 107              		.align	1
+ 108              		.syntax unified
+ 109              		.thumb
+ 110              		.thumb_func
+ 111              		.fpu fpv4-sp-d16
+ 113              	ReadRegister_INA226:
+ 114              	.LVL6:
+ 115              	.LFB138:
+  70:Core/Src/INA226_Driver.c **** 
+  71:Core/Src/INA226_Driver.c **** uint8_t ReadRegister_INA226(uint8_t addr, uint8_t reg, uint8_t *output, SMBUS_HandleTypeDef *I2C) 
+  72:Core/Src/INA226_Driver.c **** {
+ 116              		.loc 1 72 1 is_stmt 1 view -0
+ 117              		.cfi_startproc
+ 118              		@ args = 0, pretend = 0, frame = 8
+ 119              		@ frame_needed = 0, uses_anonymous_args = 0
+ 120              		.loc 1 72 1 is_stmt 0 view .LVU22
+ 121 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 122              	.LCFI3:
+ 123              		.cfi_def_cfa_offset 24
+ 124              		.cfi_offset 4, -24
+ 125              		.cfi_offset 5, -20
+ 126              		.cfi_offset 6, -16
+ 127              		.cfi_offset 7, -12
+ 128              		.cfi_offset 8, -8
+ 129              		.cfi_offset 14, -4
+ 130 0004 86B0     		sub	sp, sp, #24
+ 131              	.LCFI4:
+ 132              		.cfi_def_cfa_offset 48
+ 133 0006 0646     		mov	r6, r0
+ 134 0008 8846     		mov	r8, r1
+ 135 000a 1746     		mov	r7, r2
+ 136 000c 1D46     		mov	r5, r3
+  73:Core/Src/INA226_Driver.c ****     uint8_t buffer[2];
+ 137              		.loc 1 73 5 is_stmt 1 view .LVU23
+  74:Core/Src/INA226_Driver.c **** 
+  75:Core/Src/INA226_Driver.c ****     HAL_StatusTypeDef status = HAL_OK;
+ 138              		.loc 1 75 5 view .LVU24
+ 139              	.LVL7:
+  76:Core/Src/INA226_Driver.c ****     while (HAL_I2C_IsDeviceReady(I2C, addr, INA226_READY_TRIALS, INA226_Timeout) != HAL_OK);
+ 140              		.loc 1 76 5 view .LVU25
+ 141              	.L6:
+ 142              		.loc 1 76 92 discriminator 1 view .LVU26
+ 143              		.loc 1 76 11 discriminator 1 view .LVU27
+ 144              		.loc 1 76 12 is_stmt 0 discriminator 1 view .LVU28
+ 145 000e B4B2     		uxth	r4, r6
+ 146 0010 4FF47A73 		mov	r3, #1000
+ 147 0014 6422     		movs	r2, #100
+ 148 0016 2146     		mov	r1, r4
+ 149 0018 2846     		mov	r0, r5
+ 150 001a FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+ 151              	.LVL8:
+ 152              		.loc 1 76 11 discriminator 1 view .LVU29
+ 153 001e 0028     		cmp	r0, #0
+ 154 0020 F5D1     		bne	.L6
+  77:Core/Src/INA226_Driver.c ****     
+ARM GAS  /tmp/ccWzSuFb.s 			page 5
+
+
+  78:Core/Src/INA226_Driver.c ****     status = HAL_I2C_Mem_Read(I2C, addr, reg, I2C_MEMADD_SIZE_8BIT, buffer, 2, INA226_Timeout);
+ 155              		.loc 1 78 5 is_stmt 1 view .LVU30
+ 156              		.loc 1 78 14 is_stmt 0 view .LVU31
+ 157 0022 4FF47A73 		mov	r3, #1000
+ 158 0026 0293     		str	r3, [sp, #8]
+ 159 0028 0223     		movs	r3, #2
+ 160 002a 0193     		str	r3, [sp, #4]
+ 161 002c 05AB     		add	r3, sp, #20
+ 162 002e 0093     		str	r3, [sp]
+ 163 0030 0123     		movs	r3, #1
+ 164 0032 4246     		mov	r2, r8
+ 165 0034 2146     		mov	r1, r4
+ 166 0036 2846     		mov	r0, r5
+ 167 0038 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 168              	.LVL9:
+  79:Core/Src/INA226_Driver.c ****     *output = buffer[0];
+ 169              		.loc 1 79 5 is_stmt 1 view .LVU32
+ 170              		.loc 1 79 21 is_stmt 0 view .LVU33
+ 171 003c 9DF81420 		ldrb	r2, [sp, #20]	@ zero_extendqisi2
+ 172              		.loc 1 79 13 view .LVU34
+ 173 0040 3A70     		strb	r2, [r7]
+  80:Core/Src/INA226_Driver.c **** 
+  81:Core/Src/INA226_Driver.c ****     if (status == HAL_OK)
+ 174              		.loc 1 81 5 is_stmt 1 view .LVU35
+ 175              		.loc 1 81 8 is_stmt 0 view .LVU36
+ 176 0042 00B1     		cbz	r0, .L7
+  82:Core/Src/INA226_Driver.c ****     {
+  83:Core/Src/INA226_Driver.c ****         return INA226_SUCCESS;
+  84:Core/Src/INA226_Driver.c ****     }
+  85:Core/Src/INA226_Driver.c ****     return INA226_FAILURE;
+ 177              		.loc 1 85 12 view .LVU37
+ 178 0044 0120     		movs	r0, #1
+ 179              	.LVL10:
+ 180              	.L7:
+  86:Core/Src/INA226_Driver.c **** }...
+ 181              		.loc 1 86 1 view .LVU38
+ 182 0046 06B0     		add	sp, sp, #24
+ 183              	.LCFI5:
+ 184              		.cfi_def_cfa_offset 24
+ 185              		@ sp needed
+ 186 0048 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 187              		.loc 1 86 1 view .LVU39
+ 188              		.cfi_endproc
+ 189              	.LFE138:
+ 191              		.section	.text.Init_INA226,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	Init_INA226
+ 194              		.syntax unified
+ 195              		.thumb
+ 196              		.thumb_func
+ 197              		.fpu fpv4-sp-d16
+ 199              	Init_INA226:
+ 200              	.LVL11:
+ 201              	.LFB130:
+   8:Core/Src/INA226_Driver.c **** {
+ 202              		.loc 1 8 1 is_stmt 1 view -0
+ 203              		.cfi_startproc
+ARM GAS  /tmp/ccWzSuFb.s 			page 6
+
+
+ 204              		@ args = 0, pretend = 0, frame = 0
+ 205              		@ frame_needed = 0, uses_anonymous_args = 0
+   8:Core/Src/INA226_Driver.c **** {
+ 206              		.loc 1 8 1 is_stmt 0 view .LVU41
+ 207 0000 70B5     		push	{r4, r5, r6, lr}
+ 208              	.LCFI6:
+ 209              		.cfi_def_cfa_offset 16
+ 210              		.cfi_offset 4, -16
+ 211              		.cfi_offset 5, -12
+ 212              		.cfi_offset 6, -8
+ 213              		.cfi_offset 14, -4
+ 214 0002 0446     		mov	r4, r0
+ 215 0004 0D46     		mov	r5, r1
+   9:Core/Src/INA226_Driver.c ****     DEVICE_ADDR = configuration->DEVICE_ADDR;
+ 216              		.loc 1 9 5 is_stmt 1 view .LVU42
+   9:Core/Src/INA226_Driver.c ****     DEVICE_ADDR = configuration->DEVICE_ADDR;
+ 217              		.loc 1 9 32 is_stmt 0 view .LVU43
+ 218 0006 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 219              	.LVL12:
+   9:Core/Src/INA226_Driver.c ****     DEVICE_ADDR = configuration->DEVICE_ADDR;
+ 220              		.loc 1 9 17 view .LVU44
+ 221 0008 134E     		ldr	r6, .L11
+ 222 000a 3070     		strb	r0, [r6]
+  10:Core/Src/INA226_Driver.c ****     uint16_t configReg = 0x4000;
+ 223              		.loc 1 10 5 is_stmt 1 view .LVU45
+ 224              	.LVL13:
+  11:Core/Src/INA226_Driver.c ****     configReg |= configuration->OP_MODE;
+ 225              		.loc 1 11 5 view .LVU46
+  11:Core/Src/INA226_Driver.c ****     configReg |= configuration->OP_MODE;
+ 226              		.loc 1 11 31 is_stmt 0 view .LVU47
+ 227 000c 2279     		ldrb	r2, [r4, #4]	@ zero_extendqisi2
+  11:Core/Src/INA226_Driver.c ****     configReg |= configuration->OP_MODE;
+ 228              		.loc 1 11 15 view .LVU48
+ 229 000e 42F48042 		orr	r2, r2, #16384
+ 230              	.LVL14:
+  12:Core/Src/INA226_Driver.c ****     configReg |= (configuration->SHNT_VOLT_CONV_TIME << 3);    
+ 231              		.loc 1 12 5 is_stmt 1 view .LVU49
+  12:Core/Src/INA226_Driver.c ****     configReg |= (configuration->SHNT_VOLT_CONV_TIME << 3);    
+ 232              		.loc 1 12 32 is_stmt 0 view .LVU50
+ 233 0012 E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+  12:Core/Src/INA226_Driver.c ****     configReg |= (configuration->SHNT_VOLT_CONV_TIME << 3);    
+ 234              		.loc 1 12 15 view .LVU51
+ 235 0014 42EAC302 		orr	r2, r2, r3, lsl #3
+ 236              	.LVL15:
+  13:Core/Src/INA226_Driver.c ****     configReg |= (configuration->VBUS_CONV_TIME << 6);
+ 237              		.loc 1 13 5 is_stmt 1 view .LVU52
+  13:Core/Src/INA226_Driver.c ****     configReg |= (configuration->VBUS_CONV_TIME << 6);
+ 238              		.loc 1 13 32 is_stmt 0 view .LVU53
+ 239 0018 A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+  13:Core/Src/INA226_Driver.c ****     configReg |= (configuration->VBUS_CONV_TIME << 6);
+ 240              		.loc 1 13 15 view .LVU54
+ 241 001a 42EA8312 		orr	r2, r2, r3, lsl #6
+ 242              	.LVL16:
+  14:Core/Src/INA226_Driver.c ****     configReg |= (configuration->AVG_CONFIG << 9);
+ 243              		.loc 1 14 5 is_stmt 1 view .LVU55
+  14:Core/Src/INA226_Driver.c ****     configReg |= (configuration->AVG_CONFIG << 9);
+ 244              		.loc 1 14 32 is_stmt 0 view .LVU56
+ARM GAS  /tmp/ccWzSuFb.s 			page 7
+
+
+ 245 001e 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+  14:Core/Src/INA226_Driver.c ****     configReg |= (configuration->AVG_CONFIG << 9);
+ 246              		.loc 1 14 15 view .LVU57
+ 247 0020 42EA4322 		orr	r2, r2, r3, lsl #9
+ 248              	.LVL17:
+  15:Core/Src/INA226_Driver.c ****     uint8_t status = INA226_SUCCESS;
+ 249              		.loc 1 15 5 is_stmt 1 view .LVU58
+  16:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, configReg, I2C);
+ 250              		.loc 1 16 5 view .LVU59
+  16:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, configReg, I2C);
+ 251              		.loc 1 16 15 is_stmt 0 view .LVU60
+ 252 0024 0B46     		mov	r3, r1
+ 253 0026 92B2     		uxth	r2, r2
+  16:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, configReg, I2C);
+ 254              		.loc 1 16 15 view .LVU61
+ 255 0028 0021     		movs	r1, #0
+ 256              	.LVL18:
+  16:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, configReg, I2C);
+ 257              		.loc 1 16 15 view .LVU62
+ 258 002a FFF7FEFF 		bl	WriteRegister_INA226
+ 259              	.LVL19:
+  17:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, configuration->CALIBRATION_VALUE, I
+ 260              		.loc 1 17 5 is_stmt 1 view .LVU63
+  17:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, configuration->CALIBRATION_VALUE, I
+ 261              		.loc 1 17 15 is_stmt 0 view .LVU64
+ 262 002e 2B46     		mov	r3, r5
+ 263 0030 E288     		ldrh	r2, [r4, #6]
+ 264 0032 0521     		movs	r1, #5
+ 265 0034 3078     		ldrb	r0, [r6]	@ zero_extendqisi2
+ 266 0036 FFF7FEFF 		bl	WriteRegister_INA226
+ 267              	.LVL20:
+  18:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_ALERT_LIM_REG, configuration->ALERT_LIM, I2C
+ 268              		.loc 1 18 5 is_stmt 1 view .LVU65
+  18:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_ALERT_LIM_REG, configuration->ALERT_LIM, I2C
+ 269              		.loc 1 18 15 is_stmt 0 view .LVU66
+ 270 003a 2B46     		mov	r3, r5
+ 271 003c 6289     		ldrh	r2, [r4, #10]
+ 272 003e 0721     		movs	r1, #7
+ 273 0040 3078     		ldrb	r0, [r6]	@ zero_extendqisi2
+ 274 0042 FFF7FEFF 		bl	WriteRegister_INA226
+ 275              	.LVL21:
+  19:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_MASK_EN_REG, configuration->MASK_ENABLE_CONF
+ 276              		.loc 1 19 5 is_stmt 1 view .LVU67
+  19:Core/Src/INA226_Driver.c ****     status &= WriteRegister_INA226(DEVICE_ADDR, INA226_MASK_EN_REG, configuration->MASK_ENABLE_CONF
+ 277              		.loc 1 19 15 is_stmt 0 view .LVU68
+ 278 0046 2B46     		mov	r3, r5
+ 279 0048 2289     		ldrh	r2, [r4, #8]
+ 280 004a 0621     		movs	r1, #6
+ 281 004c 3078     		ldrb	r0, [r6]	@ zero_extendqisi2
+ 282 004e FFF7FEFF 		bl	WriteRegister_INA226
+ 283              	.LVL22:
+  20:Core/Src/INA226_Driver.c ****     return status;
+ 284              		.loc 1 20 5 is_stmt 1 view .LVU69
+  21:Core/Src/INA226_Driver.c **** }
+ 285              		.loc 1 21 1 is_stmt 0 view .LVU70
+ 286 0052 0020     		movs	r0, #0
+ 287 0054 70BD     		pop	{r4, r5, r6, pc}
+ARM GAS  /tmp/ccWzSuFb.s 			page 8
+
+
+ 288              	.LVL23:
+ 289              	.L12:
+  21:Core/Src/INA226_Driver.c **** }
+ 290              		.loc 1 21 1 view .LVU71
+ 291 0056 00BF     		.align	2
+ 292              	.L11:
+ 293 0058 00000000 		.word	.LANCHOR0
+ 294              		.cfi_endproc
+ 295              	.LFE130:
+ 297              		.section	.text.Reset_INA226,"ax",%progbits
+ 298              		.align	1
+ 299              		.global	Reset_INA226
+ 300              		.syntax unified
+ 301              		.thumb
+ 302              		.thumb_func
+ 303              		.fpu fpv4-sp-d16
+ 305              	Reset_INA226:
+ 306              	.LVL24:
+ 307              	.LFB131:
+  24:Core/Src/INA226_Driver.c **** {
+ 308              		.loc 1 24 1 is_stmt 1 view -0
+ 309              		.cfi_startproc
+ 310              		@ args = 0, pretend = 0, frame = 0
+ 311              		@ frame_needed = 0, uses_anonymous_args = 0
+  24:Core/Src/INA226_Driver.c **** {
+ 312              		.loc 1 24 1 is_stmt 0 view .LVU73
+ 313 0000 08B5     		push	{r3, lr}
+ 314              	.LCFI7:
+ 315              		.cfi_def_cfa_offset 8
+ 316              		.cfi_offset 3, -8
+ 317              		.cfi_offset 14, -4
+ 318 0002 0346     		mov	r3, r0
+  25:Core/Src/INA226_Driver.c ****     return WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, 0x8000, I2C);
+ 319              		.loc 1 25 5 is_stmt 1 view .LVU74
+  25:Core/Src/INA226_Driver.c ****     return WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, 0x8000, I2C);
+ 320              		.loc 1 25 12 is_stmt 0 view .LVU75
+ 321 0004 4FF40042 		mov	r2, #32768
+ 322 0008 0021     		movs	r1, #0
+ 323 000a 0248     		ldr	r0, .L15
+ 324              	.LVL25:
+  25:Core/Src/INA226_Driver.c ****     return WriteRegister_INA226(DEVICE_ADDR, INA226_CONFIG_REG, 0x8000, I2C);
+ 325              		.loc 1 25 12 view .LVU76
+ 326 000c 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 327 000e FFF7FEFF 		bl	WriteRegister_INA226
+ 328              	.LVL26:
+  26:Core/Src/INA226_Driver.c **** }
+ 329              		.loc 1 26 1 view .LVU77
+ 330 0012 08BD     		pop	{r3, pc}
+ 331              	.L16:
+ 332              		.align	2
+ 333              	.L15:
+ 334 0014 00000000 		.word	.LANCHOR0
+ 335              		.cfi_endproc
+ 336              	.LFE131:
+ 338              		.section	.text.ReadShuntVoltage_INA226,"ax",%progbits
+ 339              		.align	1
+ 340              		.global	ReadShuntVoltage_INA226
+ARM GAS  /tmp/ccWzSuFb.s 			page 9
+
+
+ 341              		.syntax unified
+ 342              		.thumb
+ 343              		.thumb_func
+ 344              		.fpu fpv4-sp-d16
+ 346              	ReadShuntVoltage_INA226:
+ 347              	.LVL27:
+ 348              	.LFB132:
+  29:Core/Src/INA226_Driver.c **** {
+ 349              		.loc 1 29 1 is_stmt 1 view -0
+ 350              		.cfi_startproc
+ 351              		@ args = 0, pretend = 0, frame = 0
+ 352              		@ frame_needed = 0, uses_anonymous_args = 0
+  29:Core/Src/INA226_Driver.c **** {
+ 353              		.loc 1 29 1 is_stmt 0 view .LVU79
+ 354 0000 08B5     		push	{r3, lr}
+ 355              	.LCFI8:
+ 356              		.cfi_def_cfa_offset 8
+ 357              		.cfi_offset 3, -8
+ 358              		.cfi_offset 14, -4
+ 359 0002 0346     		mov	r3, r0
+ 360 0004 0A46     		mov	r2, r1
+  30:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_SHUNT_VOLTAGE_REG, output, I2C);
+ 361              		.loc 1 30 5 is_stmt 1 view .LVU80
+  30:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_SHUNT_VOLTAGE_REG, output, I2C);
+ 362              		.loc 1 30 12 is_stmt 0 view .LVU81
+ 363 0006 0121     		movs	r1, #1
+ 364              	.LVL28:
+  30:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_SHUNT_VOLTAGE_REG, output, I2C);
+ 365              		.loc 1 30 12 view .LVU82
+ 366 0008 0248     		ldr	r0, .L19
+ 367              	.LVL29:
+  30:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_SHUNT_VOLTAGE_REG, output, I2C);
+ 368              		.loc 1 30 12 view .LVU83
+ 369 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 370 000c FFF7FEFF 		bl	ReadRegister_INA226
+ 371              	.LVL30:
+  31:Core/Src/INA226_Driver.c **** }
+ 372              		.loc 1 31 1 view .LVU84
+ 373 0010 08BD     		pop	{r3, pc}
+ 374              	.L20:
+ 375 0012 00BF     		.align	2
+ 376              	.L19:
+ 377 0014 00000000 		.word	.LANCHOR0
+ 378              		.cfi_endproc
+ 379              	.LFE132:
+ 381              		.section	.text.ReadBusVoltage_INA226,"ax",%progbits
+ 382              		.align	1
+ 383              		.global	ReadBusVoltage_INA226
+ 384              		.syntax unified
+ 385              		.thumb
+ 386              		.thumb_func
+ 387              		.fpu fpv4-sp-d16
+ 389              	ReadBusVoltage_INA226:
+ 390              	.LVL31:
+ 391              	.LFB133:
+  34:Core/Src/INA226_Driver.c **** {
+ 392              		.loc 1 34 1 is_stmt 1 view -0
+ARM GAS  /tmp/ccWzSuFb.s 			page 10
+
+
+ 393              		.cfi_startproc
+ 394              		@ args = 0, pretend = 0, frame = 0
+ 395              		@ frame_needed = 0, uses_anonymous_args = 0
+  34:Core/Src/INA226_Driver.c **** {
+ 396              		.loc 1 34 1 is_stmt 0 view .LVU86
+ 397 0000 08B5     		push	{r3, lr}
+ 398              	.LCFI9:
+ 399              		.cfi_def_cfa_offset 8
+ 400              		.cfi_offset 3, -8
+ 401              		.cfi_offset 14, -4
+ 402 0002 0346     		mov	r3, r0
+ 403 0004 0A46     		mov	r2, r1
+  35:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_BUS_VOLTAGE_REG, output, I2C);
+ 404              		.loc 1 35 5 is_stmt 1 view .LVU87
+  35:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_BUS_VOLTAGE_REG, output, I2C);
+ 405              		.loc 1 35 12 is_stmt 0 view .LVU88
+ 406 0006 0221     		movs	r1, #2
+ 407              	.LVL32:
+  35:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_BUS_VOLTAGE_REG, output, I2C);
+ 408              		.loc 1 35 12 view .LVU89
+ 409 0008 0248     		ldr	r0, .L23
+ 410              	.LVL33:
+  35:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_BUS_VOLTAGE_REG, output, I2C);
+ 411              		.loc 1 35 12 view .LVU90
+ 412 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 413 000c FFF7FEFF 		bl	ReadRegister_INA226
+ 414              	.LVL34:
+  36:Core/Src/INA226_Driver.c **** }
+ 415              		.loc 1 36 1 view .LVU91
+ 416 0010 08BD     		pop	{r3, pc}
+ 417              	.L24:
+ 418 0012 00BF     		.align	2
+ 419              	.L23:
+ 420 0014 00000000 		.word	.LANCHOR0
+ 421              		.cfi_endproc
+ 422              	.LFE133:
+ 424              		.section	.text.ReadBusPower_INA226,"ax",%progbits
+ 425              		.align	1
+ 426              		.global	ReadBusPower_INA226
+ 427              		.syntax unified
+ 428              		.thumb
+ 429              		.thumb_func
+ 430              		.fpu fpv4-sp-d16
+ 432              	ReadBusPower_INA226:
+ 433              	.LVL35:
+ 434              	.LFB134:
+  39:Core/Src/INA226_Driver.c **** {
+ 435              		.loc 1 39 1 is_stmt 1 view -0
+ 436              		.cfi_startproc
+ 437              		@ args = 0, pretend = 0, frame = 0
+ 438              		@ frame_needed = 0, uses_anonymous_args = 0
+  39:Core/Src/INA226_Driver.c **** {
+ 439              		.loc 1 39 1 is_stmt 0 view .LVU93
+ 440 0000 08B5     		push	{r3, lr}
+ 441              	.LCFI10:
+ 442              		.cfi_def_cfa_offset 8
+ 443              		.cfi_offset 3, -8
+ARM GAS  /tmp/ccWzSuFb.s 			page 11
+
+
+ 444              		.cfi_offset 14, -4
+ 445 0002 0346     		mov	r3, r0
+ 446 0004 0A46     		mov	r2, r1
+  40:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_PWR_REG, output, I2C);
+ 447              		.loc 1 40 5 is_stmt 1 view .LVU94
+  40:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_PWR_REG, output, I2C);
+ 448              		.loc 1 40 12 is_stmt 0 view .LVU95
+ 449 0006 0321     		movs	r1, #3
+ 450              	.LVL36:
+  40:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_PWR_REG, output, I2C);
+ 451              		.loc 1 40 12 view .LVU96
+ 452 0008 0248     		ldr	r0, .L27
+ 453              	.LVL37:
+  40:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_PWR_REG, output, I2C);
+ 454              		.loc 1 40 12 view .LVU97
+ 455 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 456 000c FFF7FEFF 		bl	ReadRegister_INA226
+ 457              	.LVL38:
+  41:Core/Src/INA226_Driver.c **** }
+ 458              		.loc 1 41 1 view .LVU98
+ 459 0010 08BD     		pop	{r3, pc}
+ 460              	.L28:
+ 461 0012 00BF     		.align	2
+ 462              	.L27:
+ 463 0014 00000000 		.word	.LANCHOR0
+ 464              		.cfi_endproc
+ 465              	.LFE134:
+ 467              		.section	.text.ReadBusCurrent_INA226,"ax",%progbits
+ 468              		.align	1
+ 469              		.global	ReadBusCurrent_INA226
+ 470              		.syntax unified
+ 471              		.thumb
+ 472              		.thumb_func
+ 473              		.fpu fpv4-sp-d16
+ 475              	ReadBusCurrent_INA226:
+ 476              	.LVL39:
+ 477              	.LFB135:
+  44:Core/Src/INA226_Driver.c **** {
+ 478              		.loc 1 44 1 is_stmt 1 view -0
+ 479              		.cfi_startproc
+ 480              		@ args = 0, pretend = 0, frame = 0
+ 481              		@ frame_needed = 0, uses_anonymous_args = 0
+  44:Core/Src/INA226_Driver.c **** {
+ 482              		.loc 1 44 1 is_stmt 0 view .LVU100
+ 483 0000 08B5     		push	{r3, lr}
+ 484              	.LCFI11:
+ 485              		.cfi_def_cfa_offset 8
+ 486              		.cfi_offset 3, -8
+ 487              		.cfi_offset 14, -4
+ 488 0002 0346     		mov	r3, r0
+ 489 0004 0A46     		mov	r2, r1
+  45:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CURRENT_REG, output, I2C);
+ 490              		.loc 1 45 5 is_stmt 1 view .LVU101
+  45:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CURRENT_REG, output, I2C);
+ 491              		.loc 1 45 12 is_stmt 0 view .LVU102
+ 492 0006 0421     		movs	r1, #4
+ 493              	.LVL40:
+ARM GAS  /tmp/ccWzSuFb.s 			page 12
+
+
+  45:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CURRENT_REG, output, I2C);
+ 494              		.loc 1 45 12 view .LVU103
+ 495 0008 0248     		ldr	r0, .L31
+ 496              	.LVL41:
+  45:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CURRENT_REG, output, I2C);
+ 497              		.loc 1 45 12 view .LVU104
+ 498 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 499 000c FFF7FEFF 		bl	ReadRegister_INA226
+ 500              	.LVL42:
+  46:Core/Src/INA226_Driver.c **** }
+ 501              		.loc 1 46 1 view .LVU105
+ 502 0010 08BD     		pop	{r3, pc}
+ 503              	.L32:
+ 504 0012 00BF     		.align	2
+ 505              	.L31:
+ 506 0014 00000000 		.word	.LANCHOR0
+ 507              		.cfi_endproc
+ 508              	.LFE135:
+ 510              		.section	.text.ReadCalibrationRegister_INA226,"ax",%progbits
+ 511              		.align	1
+ 512              		.global	ReadCalibrationRegister_INA226
+ 513              		.syntax unified
+ 514              		.thumb
+ 515              		.thumb_func
+ 516              		.fpu fpv4-sp-d16
+ 518              	ReadCalibrationRegister_INA226:
+ 519              	.LVL43:
+ 520              	.LFB136:
+  49:Core/Src/INA226_Driver.c **** {
+ 521              		.loc 1 49 1 is_stmt 1 view -0
+ 522              		.cfi_startproc
+ 523              		@ args = 0, pretend = 0, frame = 0
+ 524              		@ frame_needed = 0, uses_anonymous_args = 0
+  49:Core/Src/INA226_Driver.c **** {
+ 525              		.loc 1 49 1 is_stmt 0 view .LVU107
+ 526 0000 08B5     		push	{r3, lr}
+ 527              	.LCFI12:
+ 528              		.cfi_def_cfa_offset 8
+ 529              		.cfi_offset 3, -8
+ 530              		.cfi_offset 14, -4
+ 531 0002 0346     		mov	r3, r0
+ 532 0004 0A46     		mov	r2, r1
+  50:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, output, I2C);
+ 533              		.loc 1 50 5 is_stmt 1 view .LVU108
+  50:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, output, I2C);
+ 534              		.loc 1 50 12 is_stmt 0 view .LVU109
+ 535 0006 0521     		movs	r1, #5
+ 536              	.LVL44:
+  50:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, output, I2C);
+ 537              		.loc 1 50 12 view .LVU110
+ 538 0008 0248     		ldr	r0, .L35
+ 539              	.LVL45:
+  50:Core/Src/INA226_Driver.c ****     return ReadRegister_INA226(DEVICE_ADDR, INA226_CAL_REG, output, I2C);
+ 540              		.loc 1 50 12 view .LVU111
+ 541 000a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 542 000c FFF7FEFF 		bl	ReadRegister_INA226
+ 543              	.LVL46:
+ARM GAS  /tmp/ccWzSuFb.s 			page 13
+
+
+  51:Core/Src/INA226_Driver.c **** }
+ 544              		.loc 1 51 1 view .LVU112
+ 545 0010 08BD     		pop	{r3, pc}
+ 546              	.L36:
+ 547 0012 00BF     		.align	2
+ 548              	.L35:
+ 549 0014 00000000 		.word	.LANCHOR0
+ 550              		.cfi_endproc
+ 551              	.LFE136:
+ 553              		.section	.bss.DEVICE_ADDR,"aw",%nobits
+ 554              		.set	.LANCHOR0,. + 0
+ 557              	DEVICE_ADDR:
+ 558 0000 00       		.space	1
+ 559              		.text
+ 560              	.Letext0:
+ 561              		.file 2 "/usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h"
+ 562              		.file 3 "Drivers/CMSIS/Include/core_cm4.h"
+ 563              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h"
+ 564              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f302xc.h"
+ 565              		.file 6 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 566              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_smbus.h"
+ 567              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ 568              		.file 9 "Core/Inc/INA226_Driver.h"
+ 569              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c.h"
+ARM GAS  /tmp/ccWzSuFb.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 INA226_Driver.c
+     /tmp/ccWzSuFb.s:18     .text.WriteRegister_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:25     .text.WriteRegister_INA226:0000000000000000 WriteRegister_INA226
+     /tmp/ccWzSuFb.s:107    .text.ReadRegister_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:113    .text.ReadRegister_INA226:0000000000000000 ReadRegister_INA226
+     /tmp/ccWzSuFb.s:192    .text.Init_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:199    .text.Init_INA226:0000000000000000 Init_INA226
+     /tmp/ccWzSuFb.s:293    .text.Init_INA226:0000000000000058 $d
+     /tmp/ccWzSuFb.s:298    .text.Reset_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:305    .text.Reset_INA226:0000000000000000 Reset_INA226
+     /tmp/ccWzSuFb.s:334    .text.Reset_INA226:0000000000000014 $d
+     /tmp/ccWzSuFb.s:339    .text.ReadShuntVoltage_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:346    .text.ReadShuntVoltage_INA226:0000000000000000 ReadShuntVoltage_INA226
+     /tmp/ccWzSuFb.s:377    .text.ReadShuntVoltage_INA226:0000000000000014 $d
+     /tmp/ccWzSuFb.s:382    .text.ReadBusVoltage_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:389    .text.ReadBusVoltage_INA226:0000000000000000 ReadBusVoltage_INA226
+     /tmp/ccWzSuFb.s:420    .text.ReadBusVoltage_INA226:0000000000000014 $d
+     /tmp/ccWzSuFb.s:425    .text.ReadBusPower_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:432    .text.ReadBusPower_INA226:0000000000000000 ReadBusPower_INA226
+     /tmp/ccWzSuFb.s:463    .text.ReadBusPower_INA226:0000000000000014 $d
+     /tmp/ccWzSuFb.s:468    .text.ReadBusCurrent_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:475    .text.ReadBusCurrent_INA226:0000000000000000 ReadBusCurrent_INA226
+     /tmp/ccWzSuFb.s:506    .text.ReadBusCurrent_INA226:0000000000000014 $d
+     /tmp/ccWzSuFb.s:511    .text.ReadCalibrationRegister_INA226:0000000000000000 $t
+     /tmp/ccWzSuFb.s:518    .text.ReadCalibrationRegister_INA226:0000000000000000 ReadCalibrationRegister_INA226
+     /tmp/ccWzSuFb.s:549    .text.ReadCalibrationRegister_INA226:0000000000000014 $d
+     /tmp/ccWzSuFb.s:557    .bss.DEVICE_ADDR:0000000000000000 DEVICE_ADDR
+     /tmp/ccWzSuFb.s:558    .bss.DEVICE_ADDR:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_I2C_IsDeviceReady
+HAL_I2C_Mem_Write
+HAL_I2C_Mem_Read
